@@ -1,0 +1,10 @@
+{
+  "extends": "react-app",
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "process": "readonly" // Add this line
+  }
+}
