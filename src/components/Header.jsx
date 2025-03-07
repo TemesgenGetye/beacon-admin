@@ -6,7 +6,7 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
   useEffect(() => {
     async function fetchData() {
       const response = await fetch(
-        'https://proximity-based-marketing.onrender.com/api/v1/advertisements/'
+        'https://proximity-based-marketing.onrender.com/api/v1/beacons/count/'
       );
       const data = await response.json();
       console.log(data);
