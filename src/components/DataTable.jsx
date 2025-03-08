@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Edit, Trash, Eye } from 'lucide-react';
 
@@ -55,6 +53,7 @@ const DataTable = ({ data, columns, title, pagination }) => {
                     key={`${rowIndex}-${column.key}`}
                     className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                   >
+                    {/* {shouldn't show the ID column} */}
                     {column.render ? column.render(row) : row[column.key]}
                   </td>
                 ))}
@@ -77,7 +76,7 @@ const DataTable = ({ data, columns, title, pagination }) => {
       {totalPages > 1 && (
         <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200 bg-gray-50">
           <div className="text-sm text-gray-500">
-            Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, data.length)} of{' '}
+            Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, data.length)} of
             {pagination?.total || data.length} entries
           </div>
           <div className="flex items-center gap-2">

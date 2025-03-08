@@ -21,12 +21,12 @@ const Advertisements = () => {
     {
       key: 'advertisement_id',
       header: 'ID',
-      width: '100px',
+      width: '20px',
     },
     {
       key: 'title',
       header: 'Title',
-      width: '200px',
+      width: '300px',
     },
     {
       key: 'is_active',
