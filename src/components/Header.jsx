@@ -1,24 +1,14 @@
 import { Menu, Bell, User, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useEffect, useState } from 'react';
 
 const Header = ({ sidebarOpen, setSidebarOpen }) => {
-  useEffect(() => {
-    async function fetchData() {
-      const response = await fetch(
-        'https://proximity-based-marketing.onrender.com/api/v1/beacons/count/'
-      );
-      const data = await response.json();
-      console.log(data);
-    }
-    fetchData();
-  }, []);
+  // const { user, logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b shadow-sm">
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex">
+    <header className="sticky top-0 z-30 bg-white border-b">
+      <div className="px-4 sm:px-6 lg:px-8 h-16">
+        <div className="flex items-center justify-between h-full">
+          <div className="flex items-center gap-4">
             <button
               type="button"
               className="text-gray-500 hover:text-gray-600 lg:hidden"
@@ -28,23 +18,34 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
               <Menu className="h-6 w-6" />
             </button>
           </div>
-          <div className="flex items-center">
-            <button className="p-2 text-gray-400 rounded-full hover:text-gray-500 hover:bg-gray-100">
-              <span className="sr-only">View notifications</span>
-              <Bell className="h-5 w-5" />
-            </button>
-            <div className="ml-3 relative">
-              <div className="flex items-center">
-                <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                  <User className="h-5 w-5 text-gray-500" />
+
+          <div className="flex items-center gap-4">
+            {/* Notifications */}
+            <div className="relative">
+              <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                <span className="sr-only">View notifications</span>
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
+              </button>
+            </div>
+
+            {/* User Menu */}
+            <div className="relative">
+              <div className="flex items-center gap-3">
+                <div className="flex flex-col items-end">
+                  <span className="text-sm font-medium text-gray-700">
+                    {/* {user?.name || 'Admin User'}
+                     */}
+                    Admin User
+                  </span>
+                  <span className="text-xs text-gray-500">Administrator</span>
                 </div>
-                <span className="ml-2 text-sm font-medium text-gray-700 hidden md:block">
-                  {/* {user?.name || 'Admin User'} */}
-                  Admin User
-                </span>
+                <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                  <User className="h-5 w-5 text-gray-600" />
+                </div>
                 <button
                   // onClick={logout}
-                  className="ml-2 p-2 text-gray-400 rounded-full hover:text-gray-500 hover:bg-gray-100"
+                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                 >
                   <LogOut className="h-5 w-5" />
                 </button>

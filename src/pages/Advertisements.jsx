@@ -1,201 +1,140 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { Plus } from "lucide-react"
-import DataTable from "../components/DataTable"
+import { useEffect } from 'react';
+import { Plus, Search, Filter } from 'lucide-react';
+import DataTable from '../components/DataTable';
+import { useDispatch, useSelector } from 'react-redux';
+import { advertData, advertError, advertLoading } from '../Redux/slices/advertSlice';
+import { getAdverts } from '../Redux/thunks/advertThunk';
 
 const Advertisements = () => {
-  const [loading, setLoading] = useState(true)
-  const [advertisements, setAdvertisements] = useState([])
+  const dispatch = useDispatch();
+  const adverts = useSelector(advertData);
+  const isLoading = useSelector(advertLoading);
+  const error = useSelector(advertError);
 
   useEffect(() => {
-    const loadAdvertisements = async () => {
-      try {
-        // In a real app, this would fetch from the API
-        // const data = await fetchAdvertisements()
-        // setAdvertisements(data)
-
-        // Mock data for demonstration
-        setAdvertisements([
-          {
-            id: 1,
-            name: "Summer Sale",
-            status: "Active",
-            startDate: "2023-06-01",
-            endDate: "2023-08-31",
-            impressions: 1245,
-            clicks: 356,
-          },
-          {
-            id: 2,
-            name: "New Arrivals",
-            status: "Active",
-            startDate: "2023-07-01",
-            endDate: "2023-09-30",
-            impressions: 987,
-            clicks: 243,
-          },
-          {
-            id: 3,
-            name: "Weekend Deals",
-            status: "Scheduled",
-            startDate: "2023-07-15",
-            endDate: "2023-07-17",
-            impressions: 0,
-            clicks: 0,
-          },
-          {
-            id: 4,
-            name: "Flash Sale",
-            status: "Active",
-            startDate: "2023-07-05",
-            endDate: "2023-07-07",
-            impressions: 456,
-            clicks: 123,
-          },
-          {
-            id: 5,
-            name: "Clearance",
-            status: "Inactive",
-            startDate: "2023-05-01",
-            endDate: "2023-06-30",
-            impressions: 2345,
-            clicks: 567,
-          },
-          {
-            id: 6,
-            name: "Holiday Special",
-            status: "Scheduled",
-            startDate: "2023-12-01",
-            endDate: "2023-12-31",
-            impressions: 0,
-            clicks: 0,
-          },
-          {
-            id: 7,
-            name: "Back to School",
-            status: "Scheduled",
-            startDate: "2023-08-15",
-            endDate: "2023-09-15",
-            impressions: 0,
-            clicks: 0,
-          },
-          {
-            id: 8,
-            name: "Black Friday",
-            status: "Scheduled",
-            startDate: "2023-11-24",
-            endDate: "2023-11-27",
-            impressions: 0,
-            clicks: 0,
-          },
-          {
-            id: 9,
-            name: "Cyber Monday",
-            status: "Scheduled",
-            startDate: "2023-11-27",
-            endDate: "2023-11-28",
-            impressions: 0,
-            clicks: 0,
-          },
-          {
-            id: 10,
-            name: "Spring Collection",
-            status: "Inactive",
-            startDate: "2023-03-01",
-            endDate: "2023-05-31",
-            impressions: 3456,
-            clicks: 876,
-          },
-          {
-            id: 11,
-            name: "Anniversary Sale",
-            status: "Scheduled",
-            startDate: "2023-10-01",
-            endDate: "2023-10-15",
-            impressions: 0,
-            clicks: 0,
-          },
-          {
-            id: 12,
-            name: "Member Exclusive",
-            status: "Active",
-            startDate: "2023-01-01",
-            endDate: "2023-12-31",
-            impressions: 5678,
-            clicks: 1234,
-          },
-        ])
-        setLoading(false)
-      } catch (error) {
-        console.error("Error loading advertisements:", error)
-        setLoading(false)
-      }
-    }
-
-    loadAdvertisements()
-  }, [])
+    dispatch(getAdverts());
+  }, [dispatch]);
 
   const columns = [
-    { key: "id", header: "ID" },
-    { key: "name", header: "Name" },
     {
-      key: "status",
-      header: "Status",
-      render: (row) => {
-        const statusColors = {
-          Active: "bg-green-100 text-green-800",
-          Inactive: "bg-gray-100 text-gray-800",
-          Scheduled: "bg-blue-100 text-blue-800",
-        }
+      key: 'advertisement_id',
+      header: 'ID',
+      width: '100px',
+    },
+    {
+      key: 'title',
+      header: 'Title',
+      width: '200px',
+    },
+    {
+      key: 'is_active',
+      header: 'Status',
+      width: '120px',
+      render: row => {
         return (
           <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[row.status]}`}
+            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+              row.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+            }`}
           >
-            {row.status}
+            {row.is_active ? 'Active' : 'Inactive'}
           </span>
-        )
+        );
       },
     },
-    { key: "startDate", header: "Start Date" },
-    { key: "endDate", header: "End Date" },
-    { key: "impressions", header: "Impressions" },
-    { key: "clicks", header: "Clicks" },
     {
-      key: "ctr",
-      header: "CTR",
-      render: (row) => {
-        const ctr = row.impressions > 0 ? ((row.clicks / row.impressions) * 100).toFixed(2) + "%" : "N/A"
-        return ctr
-      },
+      key: 'start_date',
+      header: 'Start Date',
+      width: '150px',
+      render: row => new Date(row.start_date).toLocaleDateString(),
     },
-  ]
+    {
+      key: 'end_date',
+      header: 'End Date',
+      width: '150px',
+      render: row => new Date(row.end_date).toLocaleDateString(),
+    },
+    {
+      key: 'content',
+      header: 'Content',
+      render: row => (
+        <div className="max-w-md truncate" title={row.content}>
+          {row.content}
+        </div>
+      ),
+    },
+  ];
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-sm text-gray-500">Loading advertisements...</p>
+        </div>
       </div>
-    )
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 max-w-2xl">
+          <div className="flex">
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error loading advertisements</h3>
+              <p className="text-sm text-red-700 mt-1">{error}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Advertisements</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Advertisements</h1>
           <p className="mt-1 text-sm text-gray-500">Manage your advertisement campaigns</p>
         </div>
-        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-          <Plus className="h-4 w-4 mr-2" />
-          New Advertisement
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search advertisements..."
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+            </div>
+            <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+              <Filter className="h-5 w-5" />
+            </button>
+          </div>
+          <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+            <Plus className="h-4 w-4 mr-2" />
+            New Advertisement
+          </button>
+        </div>
       </div>
 
-      <DataTable data={advertisements} columns={columns} title="All Advertisements" />
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <DataTable
+          data={adverts?.results || []}
+          columns={columns}
+          title="All Advertisements"
+          pagination={{
+            total: adverts?.count || 0,
+            pageSize: 10,
+            current: 1,
+          }}
+        />
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Advertisements
-
+export default Advertisements;

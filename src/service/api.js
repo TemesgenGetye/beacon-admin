@@ -1,6 +1,3 @@
-// This file would contain all the API service functions to interact with the backend
-
-// Base API URL
 const API_BASE_URL = 'https://api.example.com/api/v1';
 
 // Helper function for making API requests
@@ -26,7 +23,6 @@ const fetchAPI = async (endpoint, options = {}) => {
   });
 
   if (!response.ok) {
-    // Handle 401 Unauthorized by redirecting to login
     if (response.status === 401) {
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
@@ -57,22 +53,6 @@ export const refreshToken = async token => {
 // Dashboard
 export const fetchDashboardData = async () => {
   return fetchAPI('/dashboard/');
-};
-
-// Advertisements
-export const fetchAdvertisements = async () => {
-  return fetchAPI('/advertisements/');
-};
-
-export const fetchAdvertisement = async id => {
-  return fetchAPI(`/advertisements/${id}/`);
-};
-
-export const createAdvertisement = async data => {
-  return fetchAPI('/advertisements/', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
 };
 
 export const updateAdvertisement = async (id, data) => {
