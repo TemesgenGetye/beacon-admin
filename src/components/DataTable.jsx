@@ -13,9 +13,9 @@ const DataTable = ({ data, columns, title, pagination }) => {
     <div className="overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+          <h3 className="text-lg font-medium text-forth">{title}</h3>
           <div className="flex items-center gap-2">
-            <select className="border border-gray-300 rounded-lg text-sm px-2 py-1.5">
+            <select className="bg-third rounded-xl text-sm px-3 py-2 text-white">
               <option>10 per page</option>
               <option>25 per page</option>
               <option>50 per page</option>
@@ -24,14 +24,14 @@ const DataTable = ({ data, columns, title, pagination }) => {
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-gray-200 shadow-xl rounded-xl">
           <thead className="bg-gray-50">
             <tr>
               {columns.map(column => (
                 <th
                   key={column.key}
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider whitespace-nowrap"
                   style={column.width ? { width: column.width } : {}}
                 >
                   {column.header}
@@ -39,7 +39,7 @@ const DataTable = ({ data, columns, title, pagination }) => {
               ))}
               <th
                 scope="col"
-                className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider"
               >
                 Actions
               </th>
@@ -51,7 +51,7 @@ const DataTable = ({ data, columns, title, pagination }) => {
                 {columns.map(column => (
                   <td
                     key={`${rowIndex}-${column.key}`}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                    className="px-6 py-4 whitespace-nowrap text-sm text-forth"
                   >
                     {/* {shouldn't show the ID column} */}
                     {column.render ? column.render(row) : row[column.key]}

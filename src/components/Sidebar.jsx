@@ -42,7 +42,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-64 h-[96%] rounded-l-[50px] ml-4 m-auto bg-white transform transition-all duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 h-[96%] rounded-l-[50px] shadow-xl ml-4 m-auto bg-white transform transition-all duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } ${collapsed ? 'lg:w-20' : 'lg:w-64'}`}
       >

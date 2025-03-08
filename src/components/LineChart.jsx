@@ -1,11 +1,20 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
 
 const CustomLineChart = ({ data, title, dataKeys }) => {
-  const colors = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444"]
+  const colors = ['#4cd7f6', '#150068', '#FE8360', '#04284b'];
 
   return (
-    <div className="bg-white rounded-lg shadow p-5">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">{title}</h3>
+    <div className="bg-white rounded-xl shadow p-5">
+      <h3 className="text-lg font-medium text-forth mb-4">{title}</h3>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
@@ -18,13 +27,13 @@ const CustomLineChart = ({ data, title, dataKeys }) => {
             }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="name" stroke="#9CA3AF" />
-            <YAxis stroke="#9CA3AF" />
+            <XAxis dataKey="name" stroke="#bdc0c4" />
+            <YAxis stroke="#b0b1b3" />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#fff",
-                border: "1px solid #E5E7EB",
-                borderRadius: "0.375rem",
+                backgroundColor: '#fff',
+                border: '1px solid #E5E7EB',
+                borderRadius: '0.375rem',
               }}
             />
             <Legend />
@@ -44,8 +53,7 @@ const CustomLineChart = ({ data, title, dataKeys }) => {
         </ResponsiveContainer>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CustomLineChart
-
+export default CustomLineChart;

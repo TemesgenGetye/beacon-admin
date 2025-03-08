@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
-import { Plus, Search, Filter } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Plus, Search, Filter, ChevronDown } from 'lucide-react';
 import DataTable from '../components/DataTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { advertData, advertError, advertLoading } from '../Redux/slices/advertSlice';
@@ -12,10 +12,22 @@ const Advertisements = () => {
   const adverts = useSelector(advertData);
   const isLoading = useSelector(advertLoading);
   const error = useSelector(advertError);
+  const [search, setSearch] = useState('');
+  const [dropdown, setDropdown] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(false);
 
   useEffect(() => {
     dispatch(getAdverts());
   }, [dispatch]);
+
+  const filteredAdverts = adverts?.results.filter(advert => {
+    const matchesDropdown =
+      dropdown === 'active' ? advert.is_active : dropdown === 'inactive' ? !advert.is_active : true;
+
+    const matchesSearch = search ? advert.title.toLowerCase().includes(search.toLowerCase()) : true;
+
+    return matchesDropdown && matchesSearch;
+  });
 
   const columns = [
     {
@@ -97,8 +109,8 @@ const Advertisements = () => {
     <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Advertisements</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage your advertisement campaigns</p>
+          <h1 className="text-2xl font-semibold text-forth">Advertisements</h1>
+          <p className="mt-1 text-sm text-gray-400">Manage your advertisement campaigns</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -107,14 +119,44 @@ const Advertisements = () => {
               <input
                 type="text"
                 placeholder="Search advertisements..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="pl-10 pr-4 py-2 border rounded-xl border-gray-300  focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                onChange={e => setSearch(e.target.value)}
+                value={search}
               />
             </div>
-            <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
-              <Filter className="h-5 w-5" />
+
+            {/* {filter} */}
+            <button
+              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 flex items-center"
+              onClick={() => setOpenDropdown(!openDropdown)}
+            >
+              <Filter className="h-5 w-5" color="#4cd7f6" />
+              <span className="ml-2">Filter</span>
+              <ChevronDown className="ml-2 h-4 w-4 text-gray-400" />
             </button>
+            {/* {open dropdown} */}
+            {openDropdown && (
+              <div className="relative" onClick={() => setOpenDropdown(!openDropdown)}>
+                <div className="absolute top-3 w-32 right-0 z-10 mt-2 mr-2 bg-white rounded-xl shadow-sm">
+                  <button
+                    className=" w-full p-2 text-gray-400 hover:text-gray-600 rounded-sm hover:bg-gray-100 flex items-center text-sm"
+                    onClick={() => setDropdown('active')}
+                  >
+                    Active
+                  </button>
+                  <button
+                    className=" w-full p-2 text-gray-400 hover:text-gray-600 rounded-sm hover:bg-gray-100 flex items-center text-sm"
+                    onClick={() => setDropdown('inactive')}
+                  >
+                    Inactive
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-          <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+
+          {/* {add advertisement} */}
+          <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
             <Plus className="h-4 w-4 mr-2" />
             New Advertisement
           </button>
@@ -123,11 +165,11 @@ const Advertisements = () => {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <DataTable
-          data={adverts?.results || []}
+          data={filteredAdverts}
           columns={columns}
           title="All Advertisements"
           pagination={{
-            total: adverts?.count || 0,
+            total: adverts.results.length || 0,
             pageSize: 10,
             current: 1,
           }}

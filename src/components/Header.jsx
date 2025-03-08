@@ -5,8 +5,8 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
   // const { user, logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-35 border-b border-gray-50">
-      <div className="px-4 sm:px-6 lg:px-8 h-16">
+    <header className="sticky top-2 z-35">
+      <div className="px-4 sm:px-6 lg:px-8 h-20">
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-4">
             <button
