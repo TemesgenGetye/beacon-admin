@@ -4,10 +4,10 @@ import { ChevronLeft, ChevronRight, Edit, Trash, Eye } from 'lucide-react';
 const DataTable = ({ data, columns, title, pagination }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = pagination?.pageSize || 10;
-  const totalPages = Math.ceil((pagination?.total || data.length) / itemsPerPage);
+  const totalPages = Math.ceil((pagination?.total || data?.length) / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedData = data?.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="overflow-hidden">
@@ -46,7 +46,7 @@ const DataTable = ({ data, columns, title, pagination }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedData.map((row, rowIndex) => (
+            {paginatedData?.map((row, rowIndex) => (
               <tr key={rowIndex} className="hover:bg-gray-50">
                 {columns.map(column => (
                   <td
