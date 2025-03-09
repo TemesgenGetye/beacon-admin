@@ -1,13 +1,31 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Edit, Trash, Eye } from 'lucide-react';
+import { useAdvertModel } from '../context/AdvertModelContext';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { deleteAdvert } from '../Redux/thunks/advertThunk';
 
-const DataTable = ({ data, columns, title, pagination }) => {
+const DataTable = ({
+  data,
+  columns,
+  title,
+  pagination,
+  handleOpenModal,
+  setShow,
+  setModalMode,
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = pagination?.pageSize || 10;
   const totalPages = Math.ceil((pagination?.total || data?.length) / itemsPerPage);
-
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = data?.slice(startIndex, startIndex + itemsPerPage);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleDeleteAdvert = id => {
+    console.log('delete advert', id);
+    dispatch(deleteAdvert(id));
+  };
 
   return (
     <div className="overflow-hidden">
@@ -58,13 +76,33 @@ const DataTable = ({ data, columns, title, pagination }) => {
                   </td>
                 ))}
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="text-primary hover:text-primary-dark mr-3" title="View">
+                  <button
+                    className="text-primary hover:text-primary-dark mr-3"
+                    title="View"
+                    onClick={() => {
+                      handleOpenModal(row);
+                      setShow(true);
+                      setModalMode('');
+                    }}
+                  >
                     <Eye className="h-4 w-4" />
                   </button>
-                  <button className="text-yellow-500 hover:text-yellow-600 mr-3" title="Edit">
+                  <button
+                    className="text-third hover:text-third-dark mr-3"
+                    title="Edit"
+                    onClick={() => {
+                      handleOpenModal(row);
+                      setModalMode('edit');
+                      setShow(false);
+                    }}
+                  >
                     <Edit className="h-4 w-4" />
                   </button>
-                  <button className="text-red-500 hover:text-red-600" title="Delete">
+                  <button
+                    className="text-red-500 hover:text-red-600"
+                    title="Delete"
+                    onClick={() => handleDeleteAdvert(row.advertisement_id)}
+                  >
                     <Trash className="h-4 w-4" />
                   </button>
                 </td>

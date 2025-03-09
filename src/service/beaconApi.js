@@ -10,7 +10,6 @@ const fetchAPI = async (endpoint, options = {}) => {
         ...options.headers,
       },
     });
-
     if (!response.ok) {
       const text = await response.text();
       console.log('Server Response:', text);
@@ -28,35 +27,6 @@ const fetchAPI = async (endpoint, options = {}) => {
   }
 };
 
-// Advertisements
-export const fetchAdvertisements = async () => {
-  return fetchAPI('/advertisements/');
-};
-
-export const fetchAdvertisement = async id => {
-  return fetchAPI(`/advertisements/${id}/`);
-};
-
-export const createAdvertisement = async data => {
-  console.log('data send to the backend', data);
-  return fetchAPI('/advertisements/', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-};
-
-export const updateAdvertisement = async (id, data) => {
-  console.log('data send to the backend', data);
-  console.log('data id', id);
-  return fetchAPI(`/advertisements/${id}/`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  });
-};
-
-export const deleteAdvertisement = async id => {
-  console.log('deleted id send to the backend', id);
-  return fetchAPI(`/advertisements/${id}/`, {
-    method: 'DELETE',
-  });
+export const fetchBeacons = async () => {
+  return fetchAPI('/beacons/');
 };

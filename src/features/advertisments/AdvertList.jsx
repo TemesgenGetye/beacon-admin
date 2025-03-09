@@ -3,6 +3,7 @@ import DataTable from '../../components/DataTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { advertData, advertError, advertLoading } from '../../Redux/slices/advertSlice';
 import { getAdverts } from '../../Redux/thunks/advertThunk';
+import { useAdvertModel } from '../../context/AdvertModelContext';
 
 const columns = [
   {
@@ -59,18 +60,16 @@ function AdvertList({ dropdown, search }) {
   const adverts = useSelector(advertData);
   const isLoading = useSelector(advertLoading);
   const error = useSelector(advertError);
+  const { handleOpenModal, setShow, setModalMode } = useAdvertModel();
 
   useEffect(() => {
     dispatch(getAdverts());
   }, [dispatch]);
 
-  console.log(adverts);
-  const filteredAdverts = adverts?.results.filter(advert => {
+  const filteredAdverts = adverts?.filter(advert => {
     const matchesDropdown =
       dropdown === 'active' ? advert.is_active : dropdown === 'inactive' ? !advert.is_active : true;
-
     const matchesSearch = search ? advert.title.toLowerCase().includes(search.toLowerCase()) : true;
-
     return matchesDropdown && matchesSearch;
   });
 
@@ -110,6 +109,10 @@ function AdvertList({ dropdown, search }) {
           pageSize: 10,
           current: 1,
         }}
+        // for modal handling
+        handleOpenModal={handleOpenModal}
+        setShow={setShow}
+        setModalMode={setModalMode}
       />
     </div>
   );

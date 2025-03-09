@@ -1,11 +1,50 @@
 import { useState } from 'react';
 import { Plus, Search, Filter, ChevronDown } from 'lucide-react';
 import AdvertList from '../features/advertisments/AdvertList';
+import { useAdvertModel } from '../context/AdvertModelContext';
+import AdvertModal from '../features/advertisments/AdvertModel';
+import { useDispatch, useSelector } from 'react-redux';
+import { createAdvert, updateAdvert } from '../Redux/thunks/advertThunk';
+import { advertData, advertError, advertLoading } from '../Redux/slices/advertSlice';
 
 const Advertisements = () => {
   const [search, setSearch] = useState('');
   const [dropdown, setDropdown] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
+
+  const { isModalOpen, handleOpenModal, handleCloseModal, modalMode, currentAdvert, show } =
+    useAdvertModel();
+
+  const dispatch = useDispatch();
+  const advert = useSelector(advertData);
+  const Loading = useSelector(advertLoading);
+  const Error = useSelector(advertError);
+
+  const handleAddAdvert = data => {
+    handleCloseModal();
+    const createData = {
+      ...data,
+      start_date: data.start_date.toISOString(),
+      end_date: data.end_date.toISOString(),
+      tempId: Date.now(),
+    };
+
+    dispatch(createAdvert(createData));
+  };
+
+  const handleUpdateAdvert = data => {
+    const advertData = {
+      advertisement_id: data.advertisement_id, // From the advert being edited
+      title: data.title,
+      content: data.content,
+      start_date: data.start_date.toISOString(),
+      end_date: data.end_date.toISOString(),
+      is_active: data.is_active,
+    };
+    console.log('updated data', advertData);
+    dispatch(updateAdvert(advertData));
+    handleCloseModal();
+  };
 
   return (
     <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
@@ -58,7 +97,10 @@ const Advertisements = () => {
           </div>
 
           {/* {add advertisement} */}
-          <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-primary hover:bg-primary/60">
+          <button
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-primary hover:bg-primary/60"
+            onClick={() => handleOpenModal()}
+          >
             <Plus className="h-4 w-4 mr-2" />
             New Advertisement
           </button>
@@ -66,6 +108,17 @@ const Advertisements = () => {
       </div>
       {/* {List of Advertisements} */}
       <AdvertList dropdown={dropdown} search={search} />
+      {/* {add advertisement modal} */}
+
+      <AdvertModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        handleAddAdvert={modalMode === 'create' ? handleAddAdvert : undefined}
+        handleUpdateAdvert={modalMode === 'edit' ? handleUpdateAdvert : undefined}
+        advert={currentAdvert}
+        mode={modalMode}
+        show={show}
+      />
     </div>
   );
 };
