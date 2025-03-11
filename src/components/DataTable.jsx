@@ -1,9 +1,5 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Edit, Trash, Eye } from 'lucide-react';
-import { useAdvertModel } from '../context/AdvertModelContext';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { deleteAdvert } from '../Redux/thunks/advertThunk';
 
 const DataTable = ({
   data,
@@ -13,17 +9,17 @@ const DataTable = ({
   handleOpenModal,
   setShow,
   setModalMode,
+  handleDelete,
+  idKey = 'id', // Default to 'id', override with 'advertisement_id', 'beacon_id', etc.
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = pagination?.pageSize || 10;
   const totalPages = Math.ceil((pagination?.total || data?.length) / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = data?.slice(startIndex, startIndex + itemsPerPage);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const handleDeleteAdvert = id => {
-    dispatch(deleteAdvert(id));
+  const handleDeletes = id => {
+    handleDelete(id); // Pass the ID to the parent handler
   };
 
   return (
@@ -71,18 +67,17 @@ const DataTable = ({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData?.map((row, rowIndex) => (
-              <tr key={row.advertisement_id || rowIndex} className="hover:bg-gray-50">
-                {/* Static index column */}
+              <tr key={row[idKey] || rowIndex} className="hover:bg-gray-50">
+                {/* Static index column for numbering */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {rowIndex + 1}
+                  {startIndex + rowIndex + 1} {/* Adjusted for pagination */}
                 </td>
-
                 {columns.map(column => (
                   <td
-                    key={`${rowIndex}-${column.key}`}
+                    key={`${row[idKey] || rowIndex}-${column.key}`}
                     className="px-6 py-4 whitespace-nowrap text-sm text-forth"
                   >
-                    {column.render ? column.render(row) : row[column.key]}
+                    {column.render ? column.render(row) : row[column.key] || '-'}
                   </td>
                 ))}
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -111,7 +106,7 @@ const DataTable = ({
                   <button
                     className="text-red-500 hover:text-red-600"
                     title="Delete"
-                    onClick={() => handleDeleteAdvert(row.advertisement_id)}
+                    onClick={() => handleDeletes(row[idKey])}
                   >
                     <Trash className="h-4 w-4" />
                   </button>
@@ -124,7 +119,7 @@ const DataTable = ({
       {totalPages > 1 && (
         <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200 bg-gray-50">
           <div className="text-sm text-gray-500">
-            Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, data.length)} of
+            Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, data.length)} of{' '}
             {pagination?.total || data.length} entries
           </div>
           <div className="flex items-center gap-2">

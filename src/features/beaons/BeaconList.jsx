@@ -170,6 +170,7 @@ function BeaconsList({ dropdown, search }) {
           current: 1,
         }}
         // for modal handling
+        idKey="beacon_id"
         handleOpenModal={handleOpenModal}
         setShow={setShow}
         setModalMode={setModalMode}

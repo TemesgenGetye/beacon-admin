@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import DataTable from '../../components/DataTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { advertData, advertError, advertLoading } from '../../Redux/slices/advertSlice';
-import { getAdverts } from '../../Redux/thunks/advertThunk';
+import { deleteAdvert, getAdverts } from '../../Redux/thunks/advertThunk';
 import { useAdvertModel } from '../../context/AdvertModelContext';
 
 const columns = [
@@ -73,6 +73,10 @@ function AdvertList({ dropdown, search }) {
     return matchesDropdown && matchesSearch;
   });
 
+  const handleDeleteAdvert = id => {
+    dispatch(deleteAdvert(id));
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
@@ -109,10 +113,12 @@ function AdvertList({ dropdown, search }) {
           pageSize: 10,
           current: 1,
         }}
+        idKey="advertisement_id"
         // for modal handling
         handleOpenModal={handleOpenModal}
         setShow={setShow}
         setModalMode={setModalMode}
+        handleDelete={handleDeleteAdvert}
       />
     </div>
   );
