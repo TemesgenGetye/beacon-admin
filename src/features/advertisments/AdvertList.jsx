@@ -8,7 +8,7 @@ import { useAdvertModel } from '../../context/AdvertModelContext';
 const columns = [
   {
     key: 'advertisement_id',
-    header: 'ID',
+    header: 'Advertisement ID',
     width: '20px',
   },
   {
@@ -63,8 +63,8 @@ function AdvertList({ dropdown, search }) {
   const { handleOpenModal, setShow, setModalMode } = useAdvertModel();
 
   useEffect(() => {
-    dispatch(getAdverts());
-  }, [dispatch]);
+    if (!adverts.length) dispatch(getAdverts());
+  }, [dispatch, adverts.length]);
 
   const filteredAdverts = adverts?.filter(advert => {
     const matchesDropdown =
@@ -84,7 +84,7 @@ function AdvertList({ dropdown, search }) {
     );
   }
 
-  if (error) {
+  if (error && error !== 'Server error: 204') {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
         <div className="bg-red-50 border-l-4 border-red-400 p-4 max-w-2xl">

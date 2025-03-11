@@ -4,6 +4,8 @@ import BeaconsList from '../features/beaons/BeaconList';
 import StatusCard from '../components/StatusCard';
 import { useBeaconModel } from '../context/BeaconModelContext';
 import BeaconModal from '../features/beaons/BeaconModel';
+import { useDispatch } from 'react-redux';
+import { createBeacons } from '../Redux/thunks/beaconThunk';
 
 const Beacons = () => {
   const [search, setSearch] = useState('');
@@ -12,8 +14,11 @@ const Beacons = () => {
   const { handleOpenModal, isModalOpen, handleCloseModal, modalMode, currentBeacon, show } =
     useBeaconModel();
 
+  const dispatch = useDispatch();
+
   const handleAddBeacon = data => {
-    console.log('updated data', data);
+    console.log('created data', data);
+    dispatch(createBeacons(data));
   };
 
   const handleUpdateBeacon = data => {
@@ -69,7 +74,7 @@ const Beacons = () => {
             )}
           </div>
 
-          {/* {add advertisement} */}
+          {/* {add beacon} */}
           <button
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-primary hover:bg-primary/60"
             onClick={() => handleOpenModal()}

@@ -8,7 +8,7 @@ export const BeaconProvider = ({ children }) => {
   const [show, setShow] = useState(false);
   const [modalMode, setModalMode] = useState('create');
 
-  const handleOpenModal = (beacon = null, mode) => {
+  const handleOpenModal = (beacon = null, mode = 'create') => {
     setIsModalOpen(true);
     setCurrentBeacon(beacon);
     setModalMode(mode);

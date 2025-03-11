@@ -7,7 +7,7 @@ import { getBeacons } from '../../Redux/thunks/beaconThunk';
 import { useBeaconModel } from '../../context/BeaconModelContext';
 
 const columns = [
-  { key: 'id', header: 'ID' },
+  { key: 'id', header: 'Beacon ID' },
   { key: 'name', header: 'Name' },
   {
     key: 'location',
@@ -120,7 +120,7 @@ function BeaconsList({ dropdown, search }) {
   const beacons = useSelector(beaconData);
   const isLoading = useSelector(beaconLoading);
   const error = useSelector(beaconError);
-  const { handleOpenModal, setShow, setModalMod } = useBeaconModel();
+  const { handleOpenModal, setShow, setModalMode } = useBeaconModel();
 
   useEffect(() => {
     dispatch(getBeacons());
@@ -172,7 +172,7 @@ function BeaconsList({ dropdown, search }) {
         // for modal handling
         handleOpenModal={handleOpenModal}
         setShow={setShow}
-        setModalMode={setModalMod}
+        setModalMode={setModalMode}
       />
     </div>
   );

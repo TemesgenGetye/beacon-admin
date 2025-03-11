@@ -29,8 +29,8 @@ const BeaconModal = ({
     if (beacon === null) {
       setFormData({
         beacon_id: '',
-        name: '',
-        location_name: '',
+        name: 'new beacon',
+        location_name: '22',
         minor: null,
         major: null,
         signal_strength: null,

@@ -30,3 +30,43 @@ const fetchAPI = async (endpoint, options = {}) => {
 export const fetchBeacons = async () => {
   return fetchAPI('/beacons/');
 };
+
+export const fetchBeacon = async id => {
+  return fetchAPI(`/beacons/${id}/`);
+};
+
+export const createBeacon = async data => {
+  console.log('data send to the backend', data);
+  return fetchAPI('/beacons/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+};
+
+export const updateBeacon = async (id, data) => {
+  return fetchAPI(`/beacons/${id}/`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+};
+
+export const deleteBeacon = async id => {
+  return fetchAPI(`/beacons/${id}/`, {
+    method: 'DELETE',
+  });
+};
+
+export const fetchActiveBeacons = async () => {
+  return fetchAPI('/beacons/active/');
+};
+
+export const fetchBeaconStatus = async id => {
+  return fetchAPI(`/beacons/status/${id}/`);
+};
+
+export const updateBeaconStatus = async (id, data) => {
+  return fetchAPI(`/beacons/status/${id}/`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+};

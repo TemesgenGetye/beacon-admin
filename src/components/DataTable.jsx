@@ -23,7 +23,6 @@ const DataTable = ({
   const dispatch = useDispatch();
 
   const handleDeleteAdvert = id => {
-    console.log('delete advert', id);
     dispatch(deleteAdvert(id));
   };
 
@@ -45,6 +44,13 @@ const DataTable = ({
         <table className="min-w-full divide-y divide-gray-200 shadow-xl rounded-xl">
           <thead className="bg-gray-50">
             <tr>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider whitespace-nowrap"
+                style={{ width: '50px' }}
+              >
+                #
+              </th>
               {columns.map(column => (
                 <th
                   key={column.key}
@@ -65,13 +71,17 @@ const DataTable = ({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData?.map((row, rowIndex) => (
-              <tr key={rowIndex} className="hover:bg-gray-50">
+              <tr key={row.advertisement_id || rowIndex} className="hover:bg-gray-50">
+                {/* Static index column */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {rowIndex + 1}
+                </td>
+
                 {columns.map(column => (
                   <td
                     key={`${rowIndex}-${column.key}`}
                     className="px-6 py-4 whitespace-nowrap text-sm text-forth"
                   >
-                    {/* {shouldn't show the ID column} */}
                     {column.render ? column.render(row) : row[column.key]}
                   </td>
                 ))}

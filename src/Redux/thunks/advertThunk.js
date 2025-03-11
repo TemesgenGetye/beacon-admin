@@ -57,10 +57,10 @@ export const deleteAdvert = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const data = await deleteAdvertisement(id);
-      return data;
+      return { advertisement_id: id };
     } catch (error) {
-      const errorMessage = error.message || 'Unknown error occurred';
-      return rejectWithValue(errorMessage);
+      console.log('Thunk error:', error.message);
+      return rejectWithValue(error.message);
     }
   }
 );

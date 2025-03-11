@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getBeacons } from '../thunks/beaconThunk';
+import { createBeacons, getBeacons } from '../thunks/beaconThunk';
 
 const beaconSlice = createSlice({
   name: 'beacon',
@@ -22,7 +22,6 @@ const beaconSlice = createSlice({
         state.error = null;
       })
       .addCase(getBeacons.fulfilled, (state, action) => {
-        console.log('beacon action', action.payload);
         state.beacons = action.payload;
         state.isLoading = false;
         state.error = null;
@@ -31,24 +30,28 @@ const beaconSlice = createSlice({
         state.beacons = [];
         state.isLoading = false;
         state.error = action.error.message;
+      })
+      // beacon create
+      .addCase(createBeacons.pending, (state, action) => {
+        console.log('Pending - state.beacons:', state.beacons);
+        state.isLoading = true;
+        state.error = null;
+        state.beacons.push({ ...action.meta.arg, tempId: Date.now() });
+      })
+      .addCase(createBeacons.fulfilled, (state, action) => {
+        console.log('Fulfilled - state.beacons:', state.beacons);
+        const index = state.beacons.findIndex(ad => ad.tempId === action.meta.arg.tempId);
+        if (index !== -1) state.beacons[index] = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(createBeacons.rejected, (state, action) => {
+        console.log('Rejected - state.beacons:', state.beacons);
+        state.beacons = state.beacons.filter(ad => ad.tempId !== action.meta.arg.tempId);
+        state.isLoading = false;
+        state.error = action.payload;
       });
-    //   // beacon create
-    //   .addCase(createBeacon.pending, (state, action) => {
-    //     state.isLoading = true;
-    //     state.error = null;
-    //     state.beacons.push({ ...action.meta.arg, tempId: Date.now() }); // Optimistic add
-    //   })
-    //   .addCase(createBeacon.fulfilled, (state, action) => {
-    //     const index = state.beacons.findIndex(ad => ad.tempId === action.meta.arg.tempId);
-    //     if (index !== -1) state.beacons[index] = action.payload; // Replace with server data
-    //     state.isLoading = false;
-    //   })
-    //   .addCase(createBeacon.rejected, (state, action) => {
-    //     state.beacons = state.beacons.filter(ad => ad.tempId !== action.meta.arg.tempId); // Rollback
-    //     state.isLoading = false;
-    //     state.error = action.error.message;
-    //   })
-    //   // In beaconSlice
+
+    //   // beacon update
     //   .addCase(updateBeacon.pending, (state, action) => {
     //     state.isLoading = true;
     //     state.error = null;

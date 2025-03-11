@@ -15,16 +15,17 @@ const fetchAPI = async (endpoint, options = {}) => {
       const text = await response.text();
       console.log('Server Response:', text);
       if (response.status === 500 && text.includes('beacon_id')) {
-        // Assume success despite 500 (server bug)
         const advert = options.body ? JSON.parse(options.body) : {};
-        return { ...advert }; // Return the sent data
+        return { ...advert };
       }
-      throw new Error(`Server error: ${response.status}`);
+      throw new Error(`Server error: ${response.status} - ${text}`);
     }
+
+    if (response.status === 204) return null;
     return await response.json();
   } catch (error) {
     console.log('error', error);
-    throw new Error('Server error');
+    throw error;
   }
 };
 
@@ -55,7 +56,6 @@ export const updateAdvertisement = async (id, data) => {
 };
 
 export const deleteAdvertisement = async id => {
-  console.log('deleted id send to the backend', id);
   return fetchAPI(`/advertisements/${id}/`, {
     method: 'DELETE',
   });

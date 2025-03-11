@@ -20,7 +20,7 @@ const Advertisements = () => {
   const Loading = useSelector(advertLoading);
   const Error = useSelector(advertError);
 
-  const handleAddAdvert = data => {
+  const handleAddAdvert = async data => {
     handleCloseModal();
     const createData = {
       ...data,
@@ -28,13 +28,12 @@ const Advertisements = () => {
       end_date: data.end_date.toISOString(),
       tempId: Date.now(),
     };
-
-    dispatch(createAdvert(createData));
+    await dispatch(createAdvert(createData)).unwrap();
   };
 
   const handleUpdateAdvert = data => {
     const advertData = {
-      advertisement_id: data.advertisement_id, // From the advert being edited
+      advertisement_id: data.advertisement_id,
       title: data.title,
       content: data.content,
       start_date: data.start_date.toISOString(),

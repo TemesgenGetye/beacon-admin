@@ -33,21 +33,37 @@ const advertSlice = createSlice({
       })
       // advert create
       .addCase(createAdvert.pending, (state, action) => {
-        state.isLoading = true;
+        //state.isLoading = true;
         state.error = null;
-        state.adverts.push({ ...action.meta.arg, tempId: Date.now() }); // Optimistic add
+        const tempId = Date.now();
+        const tempAdvert = { ...action.meta.arg, tempId, advertisement_id: `temp-${tempId}` };
+        state.adverts.push(tempAdvert);
       })
       .addCase(createAdvert.fulfilled, (state, action) => {
-        const index = state.adverts.findIndex(ad => ad.tempId === action.meta.arg.tempId);
-        if (index !== -1) state.adverts[index] = action.payload; // Replace with server data
+        const tempIndex = state.adverts.findIndex(ad => ad.tempId === action.meta.arg.tempId);
+        if (tempIndex !== -1) {
+          state.adverts[tempIndex] = { ...action.payload };
+        } else {
+          // Remove any temp advert with matching data, then add payload
+          state.adverts = state.adverts.filter(
+            ad =>
+              !(
+                ad.tempId &&
+                ad.title === action.payload.title &&
+                ad.content === action.payload.content
+              )
+          );
+          state.adverts.push({ ...action.payload });
+          console.log('Fulfilled - Replaced temp and added:', action.payload);
+        }
         state.isLoading = false;
       })
       .addCase(createAdvert.rejected, (state, action) => {
-        state.adverts = state.adverts.filter(ad => ad.tempId !== action.meta.arg.tempId); // Rollback
+        state.adverts = state.adverts.filter(ad => ad.tempId !== action.meta.arg.tempId);
         state.isLoading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
-      // In advertSlice
+      // advert update
       .addCase(updateAdvert.pending, (state, action) => {
         state.isLoading = true;
         state.error = null;
@@ -55,7 +71,7 @@ const advertSlice = createSlice({
           ad => ad.advertisement_id === action.meta.arg.advertisement_id
         );
         if (index !== -1) {
-          state.adverts[index] = { ...state.adverts[index], ...action.meta.arg }; // Optimistic update
+          state.adverts[index] = { ...state.adverts[index], ...action.meta.arg };
         }
       })
       .addCase(updateAdvert.fulfilled, (state, action) => {
@@ -63,7 +79,7 @@ const advertSlice = createSlice({
           ad => ad.advertisement_id === action.payload.advertisement_id
         );
         if (index !== -1) {
-          state.adverts[index] = action.payload; // Replace with server data
+          state.adverts[index] = action.payload;
         }
         state.isLoading = false;
       })
@@ -75,27 +91,22 @@ const advertSlice = createSlice({
           // No change, or revert if you track original state
         }
         state.isLoading = false;
-        state.error = action.payload; // Use payload for custom message
+        state.error = action.payload;
       })
       // advert delete
       .addCase(deleteAdvert.pending, (state, action) => {
-        state.isLoading = true;
+        // state.isLoading = true;
         state.error = null;
-        state.adverts.push({ ...action.meta.arg, tempId: Date.now() }); // Optimistic add
+        const index = state.adverts.findIndex(ad => ad.advertisement_id === action.meta.arg);
+        if (index !== -1) state.adverts.splice(index, 1);
       })
       .addCase(deleteAdvert.fulfilled, (state, action) => {
-        const index = state.adverts.findIndex(
-          ad => ad.advertisement_id === action.meta.arg.advertisement_id
-        );
-        if (index !== -1) state.adverts.splice(index, 1); // Replace with server data
         state.isLoading = false;
       })
       .addCase(deleteAdvert.rejected, (state, action) => {
-        state.adverts = state.adverts.filter(
-          ad => ad.advertisement_id !== action.meta.arg.advertisement_id
-        ); // Rollback
         state.isLoading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
+        state.adverts.push({ advertisement_id: action.meta.arg });
       });
   },
 });
