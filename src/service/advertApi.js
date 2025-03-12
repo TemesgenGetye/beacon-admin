@@ -47,8 +47,6 @@ export const createAdvertisement = async data => {
 };
 
 export const updateAdvertisement = async (id, data) => {
-  console.log('data send to the backend', data);
-  console.log('data id', id);
   return fetchAPI(`/advertisements/${id}/`, {
     method: 'PUT',
     body: JSON.stringify(data),

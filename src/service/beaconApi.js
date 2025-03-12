@@ -10,6 +10,15 @@ const fetchAPI = async (endpoint, options = {}) => {
         ...options.headers,
       },
     });
+
+    if (!response.ok && response.status !== 204) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+
+    if (response.status === 204) {
+      console.log('Delete successful, no content returned');
+      return { success: true }; // Return a simple success object
+    }
     if (!response.ok) {
       const text = await response.text();
       console.log('Server Response:', text);
@@ -43,14 +52,15 @@ export const createBeacon = async data => {
   });
 };
 
-export const updateBeacon = async (id, data) => {
+export const updateBeaconApi = async (id, data) => {
   return fetchAPI(`/beacons/${id}/`, {
     method: 'PUT',
     body: JSON.stringify(data),
   });
 };
 
-export const deleteBeacon = async id => {
+export const deleteBeaconApi = async id => {
+  console.log('delete id', id);
   return fetchAPI(`/beacons/${id}/`, {
     method: 'DELETE',
   });

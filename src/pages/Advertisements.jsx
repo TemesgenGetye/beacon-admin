@@ -21,7 +21,6 @@ const Advertisements = () => {
   const Error = useSelector(advertError);
 
   const handleAddAdvert = async data => {
-    handleCloseModal();
     const createData = {
       ...data,
       start_date: data.start_date.toISOString(),
@@ -29,6 +28,7 @@ const Advertisements = () => {
       tempId: Date.now(),
     };
     await dispatch(createAdvert(createData)).unwrap();
+    handleCloseModal();
   };
 
   const handleUpdateAdvert = data => {
@@ -40,7 +40,6 @@ const Advertisements = () => {
       end_date: data.end_date.toISOString(),
       is_active: data.is_active,
     };
-    console.log('updated data', advertData);
     dispatch(updateAdvert(advertData));
     handleCloseModal();
   };

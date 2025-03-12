@@ -10,7 +10,7 @@ const DataTable = ({
   setShow,
   setModalMode,
   handleDelete,
-  idKey = 'id', // Default to 'id', override with 'advertisement_id', 'beacon_id', etc.
+  idKey = 'id',
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = pagination?.pageSize || 10;
@@ -19,7 +19,7 @@ const DataTable = ({
   const paginatedData = data?.slice(startIndex, startIndex + itemsPerPage);
 
   const handleDeletes = id => {
-    handleDelete(id); // Pass the ID to the parent handler
+    handleDelete(id);
   };
 
   return (
@@ -68,9 +68,8 @@ const DataTable = ({
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData?.map((row, rowIndex) => (
               <tr key={row[idKey] || rowIndex} className="hover:bg-gray-50">
-                {/* Static index column for numbering */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {startIndex + rowIndex + 1} {/* Adjusted for pagination */}
+                  {startIndex + rowIndex + 1}
                 </td>
                 {columns.map(column => (
                   <td

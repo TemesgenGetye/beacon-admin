@@ -3,19 +3,33 @@ import DataTable from '../../components/DataTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { CircleCheckBig, CircleSmall, MapPin, SignalIcon } from 'lucide-react';
 import { beaconData, beaconError, beaconLoading } from '../../Redux/slices/beaconSlice';
-import { getBeacons } from '../../Redux/thunks/beaconThunk';
+import { deleteBeacon, getBeacons } from '../../Redux/thunks/beaconThunk';
 import { useBeaconModel } from '../../context/BeaconModelContext';
 
+// {
+//   "beacon_id": "279ec222-244d-433e-ae1a-07d2d14cd229",
+//   "name": "beacon 2",
+//   "minor": null,
+//   "major": null,
+//   "location_name": "Mexico",
+//   "signal_strength": null,
+//   "battery_status": null,
+//   "start_date": "2025-02-13T19:04:07.275211Z",
+//   "status": "Inactive",
+//   "latitude": null,
+//   "longitude": null
+// }
+
 const columns = [
-  { key: 'id', header: 'Beacon ID' },
+  { key: 'beacon_id', header: 'Beacon ID' },
   { key: 'name', header: 'Name' },
   {
-    key: 'location',
+    key: 'location_name',
     header: 'Location',
     render: row => (
       <div className="flex items-center justify-center">
         <MapPin className="h-4 w-4 text-gray-400 mr-1" />
-        {row.location}
+        {row.location_name}
       </div>
     ),
   },
@@ -45,7 +59,7 @@ const columns = [
     },
   },
   {
-    key: 'signal strength',
+    key: 'signal_strength',
     header: 'Signal Strength',
     render: row => {
       return (
@@ -76,7 +90,7 @@ const columns = [
     },
   },
   {
-    key: 'batteryLevel',
+    key: 'battery_status',
     header: 'Battery',
     render: row => {
       const batteryPercentage = Number.parseInt(row.batteryLevel);
@@ -101,14 +115,28 @@ const columns = [
       );
     },
   },
+  //latitiude
   {
-    key: 'longtitude and latitude',
-    header: 'Longtitude/Latitude',
+    key: 'latitude',
+    header: 'Latitude',
     render: row => {
       return (
         <div className="flex items-center justify-center">
           <MapPin className="h-4 w-4 text-gray-400 mr-1" />
-          {row.longitude}, {row.latitude}
+          {row.latitude}
+        </div>
+      );
+    },
+  },
+  //longitude
+  {
+    key: 'longitude',
+    header: 'Longitude',
+    render: row => {
+      return (
+        <div className="flex items-center justify-center">
+          <MapPin className="h-4 w-4 text-gray-400 mr-1" />
+          {row.longitude}
         </div>
       );
     },
@@ -126,12 +154,16 @@ function BeaconsList({ dropdown, search }) {
     dispatch(getBeacons());
   }, [dispatch]);
 
-  //   const filteredAdverts = adverts?.filter(advert => {
-  //     const matchesDropdown =
-  //       dropdown === 'active' ? advert.is_active : dropdown === 'inactive' ? !advert.is_active : true;
-  //     const matchesSearch = search ? advert.title.toLowerCase().includes(search.toLowerCase()) : true;
-  //     return matchesDropdown && matchesSearch;
-  //   });
+  function handleDeleteBeacon(id) {
+    dispatch(deleteBeacon(id));
+  }
+
+  const filteredBeacons = beacons?.filter(beacon => {
+    const matchesDropdown =
+      dropdown === 'active' ? beacon.is_active : dropdown === 'inactive' ? !beacon.is_active : true;
+    const matchesSearch = search ? beacon?.name.toLowerCase().includes(search.toLowerCase()) : true;
+    return matchesDropdown && matchesSearch;
+  });
 
   if (isLoading) {
     return (
@@ -161,11 +193,11 @@ function BeaconsList({ dropdown, search }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
       <DataTable
-        data={beacons?.results}
+        data={filteredBeacons}
         columns={columns}
         title="All beacon"
         pagination={{
-          total: beacons?.results?.length || 0,
+          total: beacons?.length || 0,
           pageSize: 10,
           current: 1,
         }}
@@ -174,6 +206,7 @@ function BeaconsList({ dropdown, search }) {
         handleOpenModal={handleOpenModal}
         setShow={setShow}
         setModalMode={setModalMode}
+        handleDelete={handleDeleteBeacon}
       />
     </div>
   );

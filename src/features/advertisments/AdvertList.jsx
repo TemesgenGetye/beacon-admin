@@ -62,6 +62,8 @@ function AdvertList({ dropdown, search }) {
   const error = useSelector(advertError);
   const { handleOpenModal, setShow, setModalMode } = useAdvertModel();
 
+  console.log(adverts);
+
   useEffect(() => {
     if (!adverts.length) dispatch(getAdverts());
   }, [dispatch, adverts.length]);
@@ -105,11 +107,11 @@ function AdvertList({ dropdown, search }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
       <DataTable
-        data={filteredAdverts}
+        data={filteredAdverts || []}
         columns={columns}
         title="All Advertisements"
         pagination={{
-          total: adverts?.results?.length || 0,
+          total: adverts?.length || 0,
           pageSize: 10,
           current: 1,
         }}

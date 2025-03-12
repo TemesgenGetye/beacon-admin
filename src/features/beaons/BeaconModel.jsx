@@ -28,15 +28,14 @@ const BeaconModal = ({
   useEffect(() => {
     if (beacon === null) {
       setFormData({
-        beacon_id: '',
-        name: 'new beacon',
-        location_name: '22',
-        minor: null,
-        major: null,
-        signal_strength: null,
-        battery_status: null,
-        latitude: null,
-        longitude: null,
+        name: '',
+        location_name: '',
+        minor: 0,
+        major: 0,
+        signal_strength: 0,
+        battery_status: 100,
+        latitude: 9.0192,
+        longitude: 38.7525,
         status: 'Inactive',
       });
     }
@@ -155,7 +154,7 @@ const BeaconModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-[1100] flex items-center justify-center">
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-midnight bg-opacity-50 backdrop-blur-sm"
@@ -164,7 +163,6 @@ const BeaconModal = ({
 
       {/* Modal */}
       <div className="relative bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] overflow-hidden">
-        {/* Header */}
         <div className="flex items-center justify-between text-forth px-6 py-4">
           <h2 className="text-xl font-semibold text-midnight">
             {beacon?.beacon_id ? 'Edit Beacon' : 'Create Beacon'}
@@ -174,11 +172,9 @@ const BeaconModal = ({
           </button>
         </div>
 
-        {/* Body */}
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-130px)]">
           <form>
             <div className="space-y-6">
-              {/* Name */}
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-forth mb-1">
                   Name
@@ -235,7 +231,7 @@ const BeaconModal = ({
                     name="minor"
                     value={formData.minor === null ? '' : formData.minor}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors pointer-events-none"
                     placeholder="Minor value"
                     disabled={show}
                   />
@@ -250,7 +246,7 @@ const BeaconModal = ({
                     name="major"
                     value={formData.major === null ? '' : formData.major}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2  pointer-events-none focus:ring-primary focus:border-transparent outline-none transition-colors"
                     placeholder="Major value"
                     disabled={show}
                   />
@@ -272,7 +268,7 @@ const BeaconModal = ({
                     name="signal_strength"
                     value={formData.signal_strength === null ? '' : formData.signal_strength}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl  pointer-events-none focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors"
                     placeholder="Signal strength"
                     disabled={show}
                   />
@@ -290,7 +286,7 @@ const BeaconModal = ({
                     name="battery_status"
                     value={formData.battery_status === null ? '' : formData.battery_status}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl  pointer-events-none focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors"
                     placeholder="Battery status"
                     disabled={show}
                   />
@@ -304,7 +300,7 @@ const BeaconModal = ({
                   <button
                     type="button"
                     onClick={toggleMapView}
-                    className="text-sm text-primary hover:text-primary-dark"
+                    className="text-sm text-primary hover:text-primary-dark "
                     disabled={show}
                   >
                     {mapVisible ? 'Hide Map' : 'Show Map'}
@@ -317,7 +313,10 @@ const BeaconModal = ({
                 {/* Latitude and Longitude Inputs */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
                   <div>
-                    <label htmlFor="latitude" className="block text-sm font-medium text-forth mb-1">
+                    <label
+                      htmlFor="latitude"
+                      className="block text-sm font-medium text-forth mb-1  pointer-events-none"
+                    >
                       Latitude
                     </label>
                     <input
@@ -327,7 +326,7 @@ const BeaconModal = ({
                       name="latitude"
                       value={formData.latitude === null ? '' : formData.latitude}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors ${
+                      className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent  pointer-events-none outline-none transition-colors ${
                         errors.latitude || errors.coordinates ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="-90 to 90"
@@ -351,7 +350,7 @@ const BeaconModal = ({
                       name="longitude"
                       value={formData.longitude === null ? '' : formData.longitude}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors ${
+                      className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary  pointer-events-none focus:border-transparent outline-none transition-colors ${
                         errors.longitude || errors.coordinates
                           ? 'border-red-500'
                           : 'border-gray-300'

@@ -1,5 +1,6 @@
+// beaconSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { createBeacons, getBeacons } from '../thunks/beaconThunk';
+import { createBeacons, deleteBeacon, getBeacons, updateBeacon } from '../thunks/beaconThunk';
 
 const beaconSlice = createSlice({
   name: 'beacon',
@@ -22,88 +23,93 @@ const beaconSlice = createSlice({
         state.error = null;
       })
       .addCase(getBeacons.fulfilled, (state, action) => {
-        state.beacons = action.payload;
+        console.log('getBeacons.fulfilled - payload:', action.payload);
+        state.beacons = action.payload || []; // Ensure array even if payload is undefined
         state.isLoading = false;
         state.error = null;
       })
       .addCase(getBeacons.rejected, (state, action) => {
         state.beacons = [];
         state.isLoading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
-      // beacon create
+      // beacon create 🔥🔥🔥🔥🔥🔥
+
       .addCase(createBeacons.pending, (state, action) => {
-        console.log('Pending - state.beacons:', state.beacons);
-        state.isLoading = true;
-        state.error = null;
-        state.beacons.push({ ...action.meta.arg, tempId: Date.now() });
+        const tempId = action.meta.arg.tempId; // Use tempId from createData
+        state.beacons.push({ ...action.meta.arg, beacon_id: `temp-${tempId}` });
       })
       .addCase(createBeacons.fulfilled, (state, action) => {
-        console.log('Fulfilled - state.beacons:', state.beacons);
-        const index = state.beacons.findIndex(ad => ad.tempId === action.meta.arg.tempId);
-        if (index !== -1) state.beacons[index] = action.payload;
+        if (!Array.isArray(state.beacons)) {
+          state.beacons = [];
+        }
+        const tempIndex = state.beacons.findIndex(b => b.tempId === action.meta.arg.tempId);
+        if (tempIndex !== -1) {
+          state.beacons[tempIndex] = {
+            ...state.beacons[tempIndex], // Keep tempId and other data
+            beacon_id: action.payload.beacon_id, // Update only beacon_id
+          };
+        } else {
+          state.beacons.push(action.payload);
+        }
         state.isLoading = false;
       })
       .addCase(createBeacons.rejected, (state, action) => {
-        console.log('Rejected - state.beacons:', state.beacons);
-        state.beacons = state.beacons.filter(ad => ad.tempId !== action.meta.arg.tempId);
+        state.beacons = state.beacons.filter(b => b.tempId !== action.meta.arg.tempId);
+      })
+      // beacon update 🎨🎨🎨🎨🎨🎨
+      .addCase(updateBeacon.pending, (state, action) => {
+        state.error = null;
+        const index = state.beacons.findIndex(b => b.beacon_id === action.meta.arg.beacon_id);
+        if (index !== -1) {
+          state.beacons[index] = { ...state.beacons[index], ...action.meta.arg }; // Optimistic full update
+        }
+      })
+      .addCase(updateBeacon.fulfilled, (state, action) => {
+        if (!Array.isArray(state.beacons)) {
+          state.beacons = [];
+        }
+        const index = state.beacons.findIndex(b => b.beacon_id === action.payload.beacon_id);
+        if (index !== -1) {
+          state.beacons[index] = {
+            ...state.beacons[index],
+            ...action.payload,
+          };
+        }
+        state.isLoading = false;
+      })
+      .addCase(updateBeacon.rejected, (state, action) => {
+        if (!Array.isArray(state.beacons)) {
+          state.beacons = [];
+        }
         state.isLoading = false;
         state.error = action.payload;
+      })
+      // beacon delete  🗑🗑🗑🗑🗑🗑
+      .addCase(deleteBeacon.pending, state => {
+        // state.isLoading = true;
+        state.error = null;
+        // Don't remove the beacon here yet - wait for confirmation
+      })
+      .addCase(deleteBeacon.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (!Array.isArray(state.beacons)) {
+          console.warn('state.beacons was not an array in delete fulfilled, initializing', state);
+          state.beacons = [];
+        }
+        const index = state.beacons.findIndex(b => b.beacon_id === action.payload.beacon_id);
+        if (index !== -1) {
+          state.beacons.splice(index, 1);
+          console.log('Beacon deleted from state:', action.payload.beacon_id);
+        }
+      })
+      .addCase(deleteBeacon.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+        console.log('Delete rejected:', action.payload);
       });
-
-    //   // beacon update
-    //   .addCase(updateBeacon.pending, (state, action) => {
-    //     state.isLoading = true;
-    //     state.error = null;
-    //     const index = state.beacons.findIndex(
-    //       ad => ad.advertisement_id === action.meta.arg.advertisement_id
-    //     );
-    //     if (index !== -1) {
-    //       state.beacons[index] = { ...state.beacons[index], ...action.meta.arg }; // Optimistic update
-    //     }
-    //   })
-    //   .addCase(updateBeacon.fulfilled, (state, action) => {
-    //     const index = state.beacons.findIndex(
-    //       ad => ad.advertisement_id === action.payload.advertisement_id
-    //     );
-    //     if (index !== -1) {
-    //       state.beacons[index] = action.payload; // Replace with server data
-    //     }
-    //     state.isLoading = false;
-    //   })
-    //   .addCase(updateBeacon.rejected, (state, action) => {
-    //     const index = state.beacons.findIndex(
-    //       ad => ad.advertisement_id === action.meta.arg.advertisement_id
-    //     );
-    //     if (index !== -1) {
-    //       // No change, or revert if you track original state
-    //     }
-    //     state.isLoading = false;
-    //     state.error = action.payload; // Use payload for custom message
-    //   })
-    //   // beacon delete
-    //   .addCase(deleteBeacon.pending, (state, action) => {
-    //     state.isLoading = true;
-    //     state.error = null;
-    //     state.beacons.push({ ...action.meta.arg, tempId: Date.now() }); // Optimistic add
-    //   })
-    //   .addCase(deleteBeacon.fulfilled, (state, action) => {
-    //     const index = state.beacons.findIndex(
-    //       ad => ad.advertisement_id === action.meta.arg.advertisement_id
-    //     );
-    //     if (index !== -1) state.beacons.splice(index, 1); // Replace with server data
-    //     state.isLoading = false;
-    //   })
-    //   .addCase(deleteBeacon.rejected, (state, action) => {
-    //     state.beacons = state.beacons.filter(
-    //       ad => ad.advertisement_id !== action.meta.arg.advertisement_id
-    //     ); // Rollback
-    //     state.isLoading = false;
-    //     state.error = action.error.message;
-    //   });
   },
 });
-
 export const beaconData = state => state.beacon?.beacons;
 export const beaconLoading = state => state.beacon?.isLoading;
 export const beaconError = state => state.beacon?.error;

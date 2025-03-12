@@ -22,7 +22,7 @@ const advertSlice = createSlice({
         state.error = null;
       })
       .addCase(getAdverts.fulfilled, (state, action) => {
-        state.adverts = action.payload.results; // Store only the results array
+        state.adverts = action.payload; // Store only the results array
         state.isLoading = false;
         state.error = null;
       })
@@ -31,7 +31,7 @@ const advertSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message;
       })
-      // advert create
+      // advert create 🔥🔥🔥🔥🔥🔥
       .addCase(createAdvert.pending, (state, action) => {
         //state.isLoading = true;
         state.error = null;
@@ -54,7 +54,6 @@ const advertSlice = createSlice({
               )
           );
           state.adverts.push({ ...action.payload });
-          console.log('Fulfilled - Replaced temp and added:', action.payload);
         }
         state.isLoading = false;
       })
@@ -63,7 +62,7 @@ const advertSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // advert update
+      // advert update 🎨🎨🎨🎨🎨🎨
       .addCase(updateAdvert.pending, (state, action) => {
         state.isLoading = true;
         state.error = null;
@@ -93,7 +92,7 @@ const advertSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // advert delete
+      // advert delete 🗑🗑🗑🗑🗑🗑
       .addCase(deleteAdvert.pending, (state, action) => {
         // state.isLoading = true;
         state.error = null;

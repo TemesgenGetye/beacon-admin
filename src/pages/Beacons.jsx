@@ -5,7 +5,8 @@ import StatusCard from '../components/StatusCard';
 import { useBeaconModel } from '../context/BeaconModelContext';
 import BeaconModal from '../features/beaons/BeaconModel';
 import { useDispatch } from 'react-redux';
-import { createBeacons } from '../Redux/thunks/beaconThunk';
+import { createBeacons, updateBeacon } from '../Redux/thunks/beaconThunk';
+import Map from '../components/Map';
 
 const Beacons = () => {
   const [search, setSearch] = useState('');
@@ -13,16 +14,31 @@ const Beacons = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const { handleOpenModal, isModalOpen, handleCloseModal, modalMode, currentBeacon, show } =
     useBeaconModel();
-
   const dispatch = useDispatch();
 
-  const handleAddBeacon = data => {
-    console.log('created data', data);
-    dispatch(createBeacons(data));
+  const handleAddBeacon = async data => {
+    const createData = {
+      ...data,
+      tempId: Date.now(),
+    };
+    dispatch(createBeacons(createData)).unwrap();
   };
 
   const handleUpdateBeacon = data => {
-    console.log('updated data', data);
+    const beaconData = {
+      beacon_id: data.beacon_id,
+      name: data.name,
+      location_name: data.location_name,
+      minor: data.minor,
+      status: data.status,
+      major: data.major,
+      signal_strength: data.signal_strength,
+      battery_status: data.battery_status,
+      latitude: data.latitude,
+      longitude: data.longitude,
+    };
+    console.log('beaconData:', beaconData);
+    dispatch(updateBeacon(beaconData));
   };
   return (
     <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
@@ -115,6 +131,9 @@ const Beacons = () => {
         mode={modalMode}
         show={show}
       />
+      <div className="z-20">
+        <Map />
+      </div>
     </div>
   );
 };
