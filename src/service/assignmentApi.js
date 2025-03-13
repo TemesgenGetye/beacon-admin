@@ -13,7 +13,7 @@ const fetchAPI = async (endpoint, options = {}) => {
 
     if (!response.ok) {
       const text = await response.text();
-
+      console.log('Server Response:', text);
       if (response.status === 500 && text.includes('beacon_id')) {
         const advert = options.body ? JSON.parse(options.body) : {};
         return { ...advert };
@@ -29,31 +29,33 @@ const fetchAPI = async (endpoint, options = {}) => {
   }
 };
 
-// Advertisements
-export const fetchAdvertisements = async () => {
-  return fetchAPI('/advertisements/');
+// Assignments
+export const fetchAssignments = async () => {
+  return fetchAPI('/advertisements/assignments/');
 };
 
-export const fetchAdvertisement = async id => {
-  return fetchAPI(`/advertisements/${id}/`);
+export const fetchAdvertWithBeacons = async () => {
+  return fetchAPI(`/advertisements-with-beacons/`);
 };
 
-export const createAdvertisement = async data => {
-  return fetchAPI('/advertisements/', {
+export const createAssignmentApi = async data => {
+  console.log('data send to the backend', data);
+  return fetchAPI('/advertisements/assignments/', {
     method: 'POST',
     body: JSON.stringify(data),
   });
 };
 
-export const updateAdvertisement = async (id, data) => {
-  return fetchAPI(`/advertisements/${id}/`, {
+export const updateAssignmentApi = async data => {
+  console.log('data send to the backend', data);
+  return fetchAPI(`/advertisements/assignments/${data.beacon_id}/`, {
     method: 'PUT',
     body: JSON.stringify(data),
   });
 };
 
-export const deleteAdvertisement = async id => {
-  return fetchAPI(`/advertisements/${id}/`, {
+export const deleteAssignmentApi = async id => {
+  return fetchAPI(`/advertisements/assignments/${id}/`, {
     method: 'DELETE',
   });
 };

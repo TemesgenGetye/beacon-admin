@@ -1,11 +1,18 @@
 // beaconSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { createBeacons, deleteBeacon, getBeacons, updateBeacon } from '../thunks/beaconThunk';
+import {
+  createBeacons,
+  deleteBeacon,
+  getBeacon,
+  getBeacons,
+  updateBeacon,
+} from '../thunks/beaconThunk';
 
 const beaconSlice = createSlice({
   name: 'beacon',
   initialState: {
     beacons: [],
+    beacon: [],
     isLoading: false,
     error: null,
   },
@@ -23,12 +30,26 @@ const beaconSlice = createSlice({
         state.error = null;
       })
       .addCase(getBeacons.fulfilled, (state, action) => {
-        console.log('getBeacons.fulfilled - payload:', action.payload);
         state.beacons = action.payload || []; // Ensure array even if payload is undefined
         state.isLoading = false;
         state.error = null;
       })
       .addCase(getBeacons.rejected, (state, action) => {
+        state.beacons = [];
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      // get Beacon by id 🔥🔥🔥🔥🔥🔥
+      .addCase(getBeacon.pending, (state, action) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getBeacon.fulfilled, (state, action) => {
+        state.beacon = action.payload;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(getBeacon.rejected, (state, action) => {
         state.beacons = [];
         state.isLoading = false;
         state.error = action.payload;
@@ -100,19 +121,18 @@ const beaconSlice = createSlice({
         const index = state.beacons.findIndex(b => b.beacon_id === action.payload.beacon_id);
         if (index !== -1) {
           state.beacons.splice(index, 1);
-          console.log('Beacon deleted from state:', action.payload.beacon_id);
         }
       })
       .addCase(deleteBeacon.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        console.log('Delete rejected:', action.payload);
       });
   },
 });
 export const beaconData = state => state.beacon?.beacons;
 export const beaconLoading = state => state.beacon?.isLoading;
 export const beaconError = state => state.beacon?.error;
+export const singleDataBeacon = state => state.beacon?.beacon;
 
 export const { clearBeacons } = beaconSlice.actions;
 export default beaconSlice.reducer;

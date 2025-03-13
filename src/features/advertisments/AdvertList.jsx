@@ -62,8 +62,6 @@ function AdvertList({ dropdown, search }) {
   const error = useSelector(advertError);
   const { handleOpenModal, setShow, setModalMode } = useAdvertModel();
 
-  console.log(adverts);
-
   useEffect(() => {
     if (!adverts.length) dispatch(getAdverts());
   }, [dispatch, adverts.length]);

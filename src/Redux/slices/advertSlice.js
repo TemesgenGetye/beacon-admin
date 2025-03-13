@@ -1,10 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createAdvert, deleteAdvert, getAdverts, updateAdvert } from '../thunks/advertThunk';
+import {
+  createAdvert,
+  deleteAdvert,
+  getAdvert,
+  getAdverts,
+  updateAdvert,
+} from '../thunks/advertThunk';
 
 const advertSlice = createSlice({
   name: 'advert',
   initialState: {
-    adverts: [], // Always an array
+    adverts: [],
+    advert: [],
     isLoading: false,
     error: null,
   },
@@ -30,6 +37,21 @@ const advertSlice = createSlice({
         state.adverts = [];
         state.isLoading = false;
         state.error = action.error.message;
+      })
+      // advert get 🔥🔥🔥🔥🔥🔥
+      .addCase(getAdvert.pending, (state, action) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getAdvert.fulfilled, (state, action) => {
+        state.advert = action.payload;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(getAdvert.rejected, (state, action) => {
+        state.advert = [];
+        state.isLoading = false;
+        state.error = action.payload;
       })
       // advert create 🔥🔥🔥🔥🔥🔥
       .addCase(createAdvert.pending, (state, action) => {
@@ -113,6 +135,7 @@ const advertSlice = createSlice({
 export const advertData = state => state.advert.adverts;
 export const advertLoading = state => state.advert.isLoading;
 export const advertError = state => state.advert.error;
+export const singleData = state => state.advert.advert;
 
 export const { clearAdverts } = advertSlice.actions;
 export default advertSlice.reducer;

@@ -1,51 +1,50 @@
-import { useState, useEffect } from 'react';
-import { Plus, MapPin, Search, Filter, ChevronDown } from 'lucide-react';
-import BeaconsList from '../features/beaons/BeaconList';
-import StatusCard from '../components/StatusCard';
-import { useBeaconModel } from '../context/BeaconModelContext';
-import BeaconModal from '../features/beaons/BeaconModel';
+import { ChevronDown, Filter, Plus, Search } from 'lucide-react';
+import React, { useState } from 'react';
+import AssignmentList from '../features/assignment/assignmentList';
+import { useAssignmentModel } from '../context/AssignmentContext';
+import AssignmentModal from '../features/assignment/AssignmentModel';
+import { createAssignment, getAdvertWithBeacons } from '../Redux/thunks/assignmentThunk';
 import { useDispatch } from 'react-redux';
-import { createBeacons, updateBeacon } from '../Redux/thunks/beaconThunk';
-import Map from '../components/Map';
+import AssignmentModelShow from '../features/assignment/AssignmentModelShow';
 
-const Beacons = () => {
+const Assigment = () => {
   const [search, setSearch] = useState('');
   const [dropdown, setDropdown] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
-  const { handleOpenModal, isModalOpen, handleCloseModal, modalMode, currentBeacon, show } =
-    useBeaconModel();
+
+  const {
+    handleOpenModal,
+    isModalOpen,
+    handleCloseModal,
+    modalMode,
+    currentAssignment,
+    show,
+    handleShowModel,
+    handleCloseModel,
+    showModalForAssignment,
+  } = useAssignmentModel();
+
   const dispatch = useDispatch();
 
-  const handleAddBeacon = async data => {
-    const createData = {
-      ...data,
-      tempId: Date.now(),
-    };
-    dispatch(createBeacons(createData)).unwrap();
-  };
+  function handleCreateAssignment(data) {
+    dispatch(createAssignment(data));
+    dispatch(getAdvertWithBeacons());
+    handleCloseModal();
+  }
 
-  const handleUpdateBeacon = data => {
-    const beaconData = {
-      beacon_id: data.beacon_id,
-      name: data.name,
-      location_name: data.location_name,
-      minor: data.minor,
-      status: data.status,
-      major: data.major,
-      signal_strength: data.signal_strength,
-      battery_status: data.battery_status,
-      latitude: data.latitude,
-      longitude: data.longitude,
-    };
-
-    dispatch(updateBeacon(beaconData));
-  };
+  function handleUpdateAssignment(data) {
+    // dispatch(updateAssignment(data));
+    // dispatch(getAdvertWithBeacons());
+    // handleCloseModal();
+  }
   return (
     <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-forth">Beacons</h1>
-          <p className="mt-1 text-sm text-gray-400">Manage your beacon network</p>
+          <h1 className="text-2xl font-semibold text-forth">Assignment</h1>
+          <p className="mt-1 text-sm text-gray-400">
+            Manage your beacon and advertisement assignment
+          </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -53,7 +52,7 @@ const Beacons = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search beacons..."
+                placeholder="Search assignments..."
                 className="pl-10 pr-4 py-2 border rounded-xl border-gray-300  focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                 onChange={e => setSearch(e.target.value)}
                 value={search}
@@ -90,52 +89,35 @@ const Beacons = () => {
             )}
           </div>
 
-          {/* {add beacon} */}
+          {/* {add advertisement} */}
           <button
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-primary hover:bg-primary/60"
             onClick={() => handleOpenModal()}
           >
             <Plus className="h-4 w-4 mr-2" />
-            New Beacon
+            New Assignment
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <StatusCard
-          title="Beacon Network Status"
-          status="Active"
-          description={`${'active'} of ${4} beacons are currently active.`}
-        />
-        <StatusCard
-          title="Beacon Health"
-          // status={beaconStats.warnings > 0 ? 'Warning' : 'Good'}
-          status="Warning"
-          description={`${'warning'} beacons with warnings, ${'error'} with errors.`}
-        />
-        <StatusCard
-          title="Beacon Locations"
-          status="Info"
-          description={`Beacons deployed across ${'mexico'} unique locations.`}
-        />
-      </div>
-      {/* {List of Advertisements} */}
-      <BeaconsList dropdown={dropdown} search={search} />
-
-      {/* {add beacon modal} */}
-      <BeaconModal
+      <AssignmentList dropdown={dropdown} search={search} />
+      <AssignmentModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        handleAddBeacon={modalMode === 'create' ? handleAddBeacon : undefined}
-        handleUpdateBeacon={modalMode === 'edit' ? handleUpdateBeacon : undefined}
-        beacon={currentBeacon}
+        assignment={currentAssignment}
+        onCreateAssignment={handleCreateAssignment}
+        onUpdateAssignment={handleUpdateAssignment}
         mode={modalMode}
         show={show}
       />
-      <div className="z-20">
-        <Map />
-      </div>
+      {currentAssignment && (
+        <AssignmentModelShow
+          isOpen={showModalForAssignment}
+          onClose={handleCloseModel}
+          assignment={currentAssignment}
+        />
+      )}
     </div>
   );
 };
 
-export default Beacons;
+export default Assigment;

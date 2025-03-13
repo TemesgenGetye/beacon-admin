@@ -10,6 +10,7 @@ import {
   HelpCircle,
   ChevronLeft,
   X,
+  Handshake,
 } from 'lucide-react';
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
@@ -20,6 +21,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
     { name: 'Advertisements', icon: MonitorSmartphone, path: '/advertisements' },
+    { name: 'Assigment', icon: Handshake, path: '/assigment' },
     { name: 'Beacons', icon: Radio, path: '/beacons' },
     { name: 'Logs', icon: FileText, path: '/logs' },
     { name: 'Messages', icon: MessageSquare, path: '/messages' },

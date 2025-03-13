@@ -28,10 +28,9 @@ export const getBeacon = createAsyncThunk('beacons/getBeacon', async (id, { reje
 export const createBeacons = createAsyncThunk(
   'beacons/createBeacons',
   async (beacon, { rejectWithValue }) => {
-    console.log('Thunk started, beacon:', beacon);
     try {
       const data = await createBeacon(beacon);
-      console.log('create beacon response:', data);
+
       return data;
     } catch (error) {
       console.error('Error in createBeacons thunk:', error);
@@ -56,12 +55,10 @@ export const deleteBeacon = createAsyncThunk(
   'beacons/deleteBeacon',
   async (id, { rejectWithValue }) => {
     try {
-      console.log('Delete beacon:', id);
       const data = await deleteBeaconApi(id);
-      console.log('Delete thunk data:', data); // Should log { success: true }
+
       return { beacon_id: id }; // Return the ID to remove it in the reducer
     } catch (error) {
-      console.log('Delete thunk error:', error.message);
       return rejectWithValue(error.message || 'Failed to delete beacon');
     }
   }

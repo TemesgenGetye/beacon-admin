@@ -160,7 +160,11 @@ function BeaconsList({ dropdown, search }) {
 
   const filteredBeacons = beacons?.filter(beacon => {
     const matchesDropdown =
-      dropdown === 'active' ? beacon.is_active : dropdown === 'inactive' ? !beacon.is_active : true;
+      dropdown === 'active'
+        ? beacon.status === 'Active'
+        : dropdown === 'inactive'
+          ? beacon.status !== 'Active'
+          : true;
     const matchesSearch = search ? beacon?.name.toLowerCase().includes(search.toLowerCase()) : true;
     return matchesDropdown && matchesSearch;
   });

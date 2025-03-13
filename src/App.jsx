@@ -8,6 +8,7 @@ import Advertisements from './pages/Advertisements';
 import Beacons from './pages/Beacons';
 import Logs from './pages/Logs';
 import Messages from './pages/Messages';
+import Assigment from './pages/Assigment';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -25,6 +26,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/advertisements" element={<Advertisements />} />
+              <Route path="/assigment" element={<Assigment />} />
               <Route path="/beacons" element={<Beacons />} />
               <Route path="/logs" element={<Logs />} />
               <Route path="/messages" element={<Messages />} />
