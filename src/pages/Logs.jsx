@@ -1,234 +1,96 @@
-"use client"
+import { useState, useEffect } from 'react';
+import { Calendar } from 'lucide-react';
+import DataTable from '../components/DataTable';
+import LineChart from '../components/LineChart';
+import { useDispatch, useSelector } from 'react-redux';
+import { getLogs } from '../Redux/thunks/logsThunk';
+import { logData, logError, logLoading } from '../Redux/slices/logSlice';
+import { singleDataBeacon } from '../Redux/slices/beaconSlice';
+import { getBeacon } from '../Redux/thunks/beaconThunk';
+import DataTableLogsMessage from '../components/DataTableLogsMessage';
 
-import { useState, useEffect } from "react"
-import { Calendar } from "lucide-react"
-import DataTable from "../components/DataTable"
-import LineChart from "../components/LineChart"
+const timeframeData = [
+  {
+    name: 'Jan 1',
+    logs: 4000,
+    success: 2400,
+    failed: 2400,
+  },
+];
+
+// {
+//   "beacon_id": "e7f0ebe1-7a8f-4846-9ccf-581371452fa9",
+//   "log_id": 1,
+//   "timestamp": "2025-02-17T06:27:03.324835Z",
+//   "advertisement_title": "YBS Commissioning",
+//   "advertisement_content": "We are offering an Expert services in commissioning works, ensuring efficiency and reliability in various operations."
+// }
+const columns = [
+  { key: 'log_id', header: 'ID' },
+  { key: 'advertisement_title', header: 'Advertisement' },
+  { key: 'beacon_id', header: 'Beacon' },
+  {
+    key: 'advertisement_content',
+    header: 'Content',
+    width: '200px',
+    render: row => (
+      <div className="text-sm text-gray-500 line-clamp-1 text-ellipsis">
+        {row.advertisement_content}
+      </div>
+    ),
+  },
+  {
+    key: 'timestamp',
+    header: 'Timestamp',
+    render: row => (
+      <div className="flex items-center">
+        <Calendar className="h-4 w-4 text-gray-400 mr-1" />
+        {row.timestamp}
+      </div>
+    ),
+  },
+];
+
+const timeframeChartKeys = [
+  { id: 'logs', name: 'Total Logs' },
+  { id: 'success', name: 'Success' },
+  { id: 'failed', name: 'Failed' },
+];
 
 const Logs = () => {
-  const [loading, setLoading] = useState(true)
-  const [logs, setLogs] = useState([])
-  const [logStats, setLogStats] = useState({})
-  const [timeframeData, setTimeframeData] = useState([])
+  const dispatch = useDispatch();
+  const logs = useSelector(logData);
+  const loading = useSelector(logLoading);
+  const error = useSelector(logError);
 
   useEffect(() => {
-    const loadLogs = async () => {
-      try {
-        // In a real app, this would fetch from the API
-        // const data = await fetchLogs()
-        // setLogs(data)
+    dispatch(getLogs());
+  }, [dispatch]);
 
-        // Mock data for demonstration
-        setLogs([
-          {
-            id: 1,
-            advertisement: "Summer Sale",
-            beacon: "Store Front",
-            timestamp: "2023-07-01 14:23:45",
-            status: "Success",
-            impressions: 45,
-            clicks: 12,
-          },
-          {
-            id: 2,
-            advertisement: "New Arrivals",
-            beacon: "Mall Entrance",
-            timestamp: "2023-07-01 13:45:22",
-            status: "Success",
-            impressions: 32,
-            clicks: 8,
-          },
-          {
-            id: 3,
-            advertisement: "Weekend Deals",
-            beacon: "Food Court",
-            timestamp: "2023-07-01 12:12:34",
-            status: "Failed",
-            impressions: 0,
-            clicks: 0,
-          },
-          {
-            id: 4,
-            advertisement: "Flash Sale",
-            beacon: "Electronics Dept",
-            timestamp: "2023-07-01 11:56:12",
-            status: "Success",
-            impressions: 28,
-            clicks: 7,
-          },
-          {
-            id: 5,
-            advertisement: "Clearance",
-            beacon: "Exit Gate",
-            timestamp: "2023-07-01 10:34:56",
-            status: "Success",
-            impressions: 56,
-            clicks: 15,
-          },
-          {
-            id: 6,
-            advertisement: "Member Exclusive",
-            beacon: "Parking Lot",
-            timestamp: "2023-07-01 09:23:11",
-            status: "Success",
-            impressions: 18,
-            clicks: 4,
-          },
-          {
-            id: 7,
-            advertisement: "Summer Sale",
-            beacon: "Checkout Area",
-            timestamp: "2023-07-01 08:45:33",
-            status: "Success",
-            impressions: 22,
-            clicks: 6,
-          },
-          {
-            id: 8,
-            advertisement: "New Arrivals",
-            beacon: "Clothing Section",
-            timestamp: "2023-06-30 15:12:45",
-            status: "Failed",
-            impressions: 0,
-            clicks: 0,
-          },
-          {
-            id: 9,
-            advertisement: "Weekend Deals",
-            beacon: "Restaurant",
-            timestamp: "2023-06-30 14:05:22",
-            status: "Success",
-            impressions: 34,
-            clicks: 9,
-          },
-          {
-            id: 10,
-            advertisement: "Flash Sale",
-            beacon: "Movie Theater",
-            timestamp: "2023-06-30 13:34:11",
-            status: "Success",
-            impressions: 41,
-            clicks: 11,
-          },
-          {
-            id: 11,
-            advertisement: "Clearance",
-            beacon: "Store Front",
-            timestamp: "2023-06-30 12:23:45",
-            status: "Success",
-            impressions: 29,
-            clicks: 7,
-          },
-          {
-            id: 12,
-            advertisement: "Member Exclusive",
-            beacon: "Mall Entrance",
-            timestamp: "2023-06-30 11:45:22",
-            status: "Success",
-            impressions: 37,
-            clicks: 10,
-          },
-          {
-            id: 13,
-            advertisement: "Summer Sale",
-            beacon: "Food Court",
-            timestamp: "2023-06-30 10:12:34",
-            status: "Failed",
-            impressions: 0,
-            clicks: 0,
-          },
-          {
-            id: 14,
-            advertisement: "New Arrivals",
-            beacon: "Electronics Dept",
-            timestamp: "2023-06-30 09:56:12",
-            status: "Success",
-            impressions: 25,
-            clicks: 6,
-          },
-          {
-            id: 15,
-            advertisement: "Weekend Deals",
-            beacon: "Exit Gate",
-            timestamp: "2023-06-30 08:34:56",
-            status: "Success",
-            impressions: 31,
-            clicks: 8,
-          },
-        ])
-
-        setLogStats({
-          total: 15,
-          success: 12,
-          failed: 3,
-          impressions: 398,
-          clicks: 103,
-        })
-
-        setTimeframeData([
-          { name: "00:00", logs: 0, success: 0, failed: 0 },
-          { name: "03:00", logs: 0, success: 0, failed: 0 },
-          { name: "06:00", logs: 0, success: 0, failed: 0 },
-          { name: "09:00", logs: 5, success: 4, failed: 1 },
-          { name: "12:00", logs: 5, success: 4, failed: 1 },
-          { name: "15:00", logs: 5, success: 4, failed: 1 },
-          { name: "18:00", logs: 0, success: 0, failed: 0 },
-          { name: "21:00", logs: 0, success: 0, failed: 0 },
-        ])
-
-        setLoading(false)
-      } catch (error) {
-        console.error("Error loading logs:", error)
-        setLoading(false)
-      }
-    }
-
-    loadLogs()
-  }, [])
-
-  const columns = [
-    { key: "id", header: "ID" },
-    { key: "advertisement", header: "Advertisement" },
-    { key: "beacon", header: "Beacon" },
-    {
-      key: "timestamp",
-      header: "Timestamp",
-      render: (row) => (
-        <div className="flex items-center">
-          <Calendar className="h-4 w-4 text-gray-400 mr-1" />
-          {row.timestamp}
-        </div>
-      ),
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (row) => (
-        <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            row.status === "Success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
-        >
-          {row.status}
-        </span>
-      ),
-    },
-    { key: "impressions", header: "Impressions" },
-    { key: "clicks", header: "Clicks" },
-  ]
-
-  const timeframeChartKeys = [
-    { id: "logs", name: "Total Logs" },
-    { id: "success", name: "Success" },
-    { id: "failed", name: "Failed" },
-  ]
-
+  function handleDeletes(id) {
+    console.log(id);
+  }
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
-    )
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 max-w-2xl">
+          <div className="flex">
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error loading advertisements</h3>
+              <p className="text-sm text-red-700 mt-1">{error}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -242,33 +104,44 @@ const Logs = () => {
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
         <div className="bg-white rounded-lg shadow p-5">
           <p className="text-sm font-medium text-gray-500">Total Logs</p>
-          <p className="text-2xl font-semibold mt-1">{logStats.total}</p>
+          {/* <p className="text-2xl font-semibold mt-1">{logStats.total}</p> */}
         </div>
         <div className="bg-white rounded-lg shadow p-5">
           <p className="text-sm font-medium text-gray-500">Success Rate</p>
-          <p className="text-2xl font-semibold mt-1">{((logStats.success / logStats.total) * 100).toFixed(1)}%</p>
+          <p className="text-2xl font-semibold mt-1">
+            {/* {((logStats.success / logStats.total) * 100).toFixed(1)}% */}
+          </p>
         </div>
         <div className="bg-white rounded-lg shadow p-5">
           <p className="text-sm font-medium text-gray-500">Failed</p>
-          <p className="text-2xl font-semibold mt-1">{logStats.failed}</p>
+          {/* <p className="text-2xl font-semibold mt-1">{logStats.failed}</p> */}
         </div>
         <div className="bg-white rounded-lg shadow p-5">
           <p className="text-sm font-medium text-gray-500">Impressions</p>
-          <p className="text-2xl font-semibold mt-1">{logStats.impressions}</p>
+          {/* <p className="text-2xl font-semibold mt-1">{logStats.impressions}</p> */}
         </div>
         <div className="bg-white rounded-lg shadow p-5">
           <p className="text-sm font-medium text-gray-500">Clicks</p>
-          <p className="text-2xl font-semibold mt-1">{logStats.clicks}</p>
+          {/* <p className="text-2xl font-semibold mt-1">{logStats.clicks}</p> */}
         </div>
       </div>
 
       {/* Log Timeframe Chart */}
-      <LineChart data={timeframeData} title="Log Activity (Last 24 Hours)" dataKeys={timeframeChartKeys} />
+      <LineChart
+        data={timeframeData}
+        title="Log Activity (Last 24 Hours)"
+        dataKeys={timeframeChartKeys}
+      />
 
-      <DataTable data={logs} columns={columns} title="Recent Logs" />
+      <DataTableLogsMessage
+        data={logs}
+        columns={columns}
+        title="Recent Logs"
+        handleDelete={handleDeletes}
+        idKey="log_id"
+      />
     </div>
-  )
-}
+  );
+};
 
-export default Logs
-
+export default Logs;
