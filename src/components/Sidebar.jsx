@@ -50,33 +50,29 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between h-16 px-6 py-20">
-            <div className="flex items-center">
-              <div className="flex items-center justify-center">
-                <Radio className="h-10 w-10 text-primary" />
+          <button
+            className="hidden lg:block text-gray-400 hover:text-gray-600"
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            <div className="flex items-center justify-between h-16 px-6 py-20">
+              <div className="flex items-center">
+                <div className="flex items-center justify-center">
+                  <Radio className="h-10 w-10 text-primary" />
+                </div>
+                {!collapsed && (
+                  <span className="ml-3 text-xl font-medium text-primary">Beacon Dash</span>
+                )}
               </div>
-              {!collapsed && (
-                <span className="ml-3 text-xl font-medium text-primary">Beacon Dash</span>
-              )}
+              <div className="flex items-center">
+                <button
+                  className="text-gray-400 hover:text-gray-600 lg:hidden"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center">
-              <button
-                className="text-gray-400 hover:text-gray-600 lg:hidden"
-                onClick={() => setSidebarOpen(false)}
-              >
-                <X className="h-5 w-5" />
-              </button>
-              <button
-                className="hidden lg:block text-gray-400 hover:text-gray-600"
-                onClick={() => setCollapsed(!collapsed)}
-              >
-                <ChevronLeft
-                  className={`h-5 w-5 transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`}
-                  color="#4cd7f6"
-                />
-              </button>
-            </div>
-          </div>
+          </button>
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-6">

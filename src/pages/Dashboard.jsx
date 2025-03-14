@@ -1,91 +1,123 @@
-'use client';
-
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Radio, MonitorSmartphone, FileText, MessageSquare } from 'lucide-react';
 import MetricCard from '../components/MetricCard';
 import LineChart from '../components/LineChart';
 import BarChart from '../components/BarChart';
-import DataTable from '../components/DataTable';
+import AdvertList from '../features/advertisments/AdvertList';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAdverts } from '../Redux/thunks/advertThunk';
+import { advertData, advertError, advertLoading } from '../Redux/slices/advertSlice';
+import { getBeacons } from '../Redux/thunks/beaconThunk';
+import { beaconData, beaconError, beaconLoading } from '../Redux/slices/beaconSlice';
+import { getMessages } from '../Redux/thunks/messageThnuk';
+import { messageData, messageError, messageLoading } from '../Redux/slices/messageSlice';
+import { getLogs } from '../Redux/thunks/logsThunk';
+import { logData, logError, logLoading } from '../Redux/slices/logSlice';
 
 const Dashboard = () => {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
+  const dispatch = useDispatch();
 
+  // Selectors for Redux state (assuming these will hold the data you provided)
+  const adverts = useSelector(advertData) || [
+    /* Your advertisement object */ {
+      title: 'YBS Commissioning',
+      content:
+        'We are offering an Expert services in commissioning works, ensuring efficiency and reliability in various operations.',
+      start_date: '2025-04-20',
+      end_date: '2025-05-29',
+      is_active: true,
+    },
+  ];
+  const isLoading = useSelector(advertLoading);
+  const error = useSelector(advertError);
+
+  const beacons = useSelector(beaconData) || [
+    /* Your beacon object */ {
+      name: 'Beacon 2',
+      location_name: 'Wello',
+      minor: 0,
+      major: 0,
+      signal_strength: 0,
+      battery_status: 100,
+      coordinates: { latitude: 9.0192, longitude: 38.7525 },
+      status: 'Active',
+    },
+  ];
+  const isLoadingBeacons = useSelector(beaconLoading);
+  const errorBeacons = useSelector(beaconError);
+
+  const messages = useSelector(messageData) || [
+    /* Your message object */ {
+      id: 1,
+      beacon_id: '38941605-0664-46f1-8d5d-9c5182d9b40e',
+      beacon_name: 'Beacon 1',
+      content: 'download our app from this(link)',
+      sent_at: '2025-02-15T05:56:21.157369Z',
+      read_at: '2025-02-16T00:00:00Z',
+    },
+  ];
+  const isLoadingMessages = useSelector(messageLoading);
+  const errorMessages = useSelector(messageError);
+
+  const logs = useSelector(logData) || [
+    /* Your log object */ {
+      id: 1,
+      advertisement: 'YBS Commissioning',
+      beacon: 'e7f0ebe1-7a8f-4846-9ccf-581371452fa9',
+      content:
+        'We are offering Expert services in commissioning works, ensuring efficiency and reliability in various operations.',
+      timestamp: '2025-02-17T06:27:03.324835Z',
+    },
+  ];
+  const isLoadingLogs = useSelector(logLoading);
+  const errorLogs = useSelector(logError);
+
+  // Calculate metrics from your data
+  const activeBeaconsCount = beacons.filter(beacon => beacon.status === 'Active').length;
+  const activeAdvertsCount = adverts.filter(advert => advert.is_active).length;
+  const totalLogs = logs.length;
+  const totalMessages = messages.length;
+
+  const metrics = {
+    activeBeacons: activeBeaconsCount,
+    activeAds: activeAdvertsCount,
+    totalLogs,
+    totalMessages,
+  };
+
+  // Fetch data on mount
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setData({
-          metrics: {
-            activeBeacons: 124,
-            activeAds: 45,
-            totalLogs: 1256,
-            totalMessages: 876,
-          },
-          trendsData: [
-            { name: 'Jan', impressions: 400, clicks: 240, conversions: 100 },
-            { name: 'Feb', impressions: 300, clicks: 139, conversions: 80 },
-            { name: 'Mar', impressions: 200, clicks: 980, conversions: 200 },
-            { name: 'Apr', impressions: 278, clicks: 390, conversions: 150 },
-            { name: 'May', impressions: 189, clicks: 480, conversions: 170 },
-            { name: 'Jun', impressions: 239, clicks: 380, conversions: 120 },
-            { name: 'Jul', impressions: 349, clicks: 430, conversions: 190 },
-          ],
-          beaconLocations: [
-            { name: 'New York', count: 35 },
-            { name: 'Los Angeles', count: 28 },
-            { name: 'Chicago', count: 18 },
-            { name: 'Houston', count: 15 },
-            { name: 'Phoenix', count: 12 },
-          ],
-          recentLogs: [
-            {
-              id: 1,
-              advertisement: 'Summer Sale',
-              beacon: 'Store Front',
-              timestamp: '2023-07-01 14:23:45',
-              status: 'Success',
-            },
-            {
-              id: 2,
-              advertisement: 'New Arrivals',
-              beacon: 'Mall Entrance',
-              timestamp: '2023-07-01 13:45:22',
-              status: 'Success',
-            },
-            {
-              id: 3,
-              advertisement: 'Weekend Deals',
-              beacon: 'Food Court',
-              timestamp: '2023-07-01 12:12:34',
-              status: 'Failed',
-            },
-            {
-              id: 4,
-              advertisement: 'Flash Sale',
-              beacon: 'Electronics Dept',
-              timestamp: '2023-07-01 11:56:12',
-              status: 'Success',
-            },
-            {
-              id: 5,
-              advertisement: 'Clearance',
-              beacon: 'Exit Gate',
-              timestamp: '2023-07-01 10:34:56',
-              status: 'Success',
-            },
-          ],
-        });
-        setLoading(false);
-      } catch (error) {
-        console.error('Error loading dashboard data:', error);
-        setLoading(false);
-      }
-    };
+    dispatch(getAdverts());
+    dispatch(getBeacons());
+    dispatch(getMessages());
+    dispatch(getLogs());
+  }, [dispatch]);
 
-    loadData();
-  }, []);
+  // Prepare data for LineChart (log activity over time)
+  const logTrendsData = () => {
+    const logsByDay = {};
+    logs.forEach(log => {
+      const date = new Date(log.timestamp);
+      const day = date.toISOString().split('T')[0]; // e.g., "2025-02-17"
+      logsByDay[day] = (logsByDay[day] || 0) + 1;
+    });
 
-  if (loading) {
+    return Object.entries(logsByDay).map(([name, count]) => ({
+      name, // Date as name
+      logs: count, // Number of logs on that day
+    }));
+  };
+
+  // Prepare data for BarChart (beacon battery status)
+  const beaconBatteryData = () => {
+    return beacons.map(beacon => ({
+      name: beacon.name,
+      battery: beacon.battery_status, // Battery status as a value
+    }));
+  };
+
+  // Loading and error states
+  if (isLoading || isLoadingBeacons || isLoadingMessages || isLoadingLogs) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -93,33 +125,25 @@ const Dashboard = () => {
     );
   }
 
-  const trendChartKeys = [
-    { id: 'impressions', name: 'Impressions' },
-    { id: 'clicks', name: 'Clicks' },
-    { id: 'conversions', name: 'Conversions' },
-  ];
+  if (error || errorBeacons || errorMessages || errorLogs) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 max-w-2xl">
+          <div className="flex">
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error loading data</h3>
+              <p className="text-sm text-red-700 mt-1">
+                {error || errorBeacons || errorMessages || errorLogs}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const locationChartKeys = [{ id: 'count', name: 'Beacon Count' }];
-
-  const logColumns = [
-    { key: 'id', header: 'ID' },
-    { key: 'advertisement', header: 'Advertisement' },
-    { key: 'beacon', header: 'Beacon' },
-    { key: 'timestamp', header: 'Timestamp' },
-    {
-      key: 'status',
-      header: 'Status',
-      render: row => (
-        <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            row.status === 'Success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-          }`}
-        >
-          {row.status}
-        </span>
-      ),
-    },
-  ];
+  const trendChartKeys = [{ id: 'logs', name: 'Log Count' }];
+  const batteryChartKeys = [{ id: 'battery', name: 'Battery Status (%)' }];
 
   return (
     <div className="space-y-6 p-2">
@@ -130,53 +154,33 @@ const Dashboard = () => {
 
       {/* Metrics */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          title="Active Beacons"
-          value={data.metrics.activeBeacons}
-          icon={Radio}
-          change="12%"
-          changeType="increase"
-        />
+        <MetricCard title="Active Beacons" value={metrics.activeBeacons} icon={Radio} />
         <MetricCard
           title="Active Advertisements"
-          value={data.metrics.activeAds}
+          value={metrics.activeAds}
           icon={MonitorSmartphone}
-          change="5%"
-          changeType="increase"
         />
-        <MetricCard
-          title="Total Logs"
-          value={data.metrics.totalLogs}
-          icon={FileText}
-          change="8%"
-          changeType="increase"
-        />
-        <MetricCard
-          title="Total Messages"
-          value={data.metrics.totalMessages}
-          icon={MessageSquare}
-          change="3%"
-          changeType="decrease"
-        />
+        <MetricCard title="Total Logs" value={metrics.totalLogs} icon={FileText} />
+        <MetricCard title="Total Messages" value={metrics.totalMessages} icon={MessageSquare} />
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <LineChart
-          data={data.trendsData}
-          title="Advertisement Performance Trends"
+          data={logTrendsData()}
+          title="Log Activity Over Time"
           dataKeys={trendChartKeys}
         />
         <BarChart
-          data={data.beaconLocations}
-          title="Beacon Locations"
-          dataKeys={locationChartKeys}
+          data={beaconBatteryData()}
+          title="Beacon Battery Status"
+          dataKeys={batteryChartKeys}
         />
       </div>
 
-      {/* Recent Logs */}
+      {/* Advertisements List */}
       <div>
-        <DataTable data={data.recentLogs} columns={logColumns} title="Recent Advertisement Logs" />
+        <AdvertList />
       </div>
     </div>
   );

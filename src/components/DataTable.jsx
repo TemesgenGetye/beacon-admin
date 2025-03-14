@@ -27,13 +27,7 @@ const DataTable = ({
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium text-forth">{title}</h3>
-          <div className="flex items-center gap-2">
-            <select className="bg-third rounded-xl text-sm px-3 py-2 text-white">
-              <option>10 per page</option>
-              <option>25 per page</option>
-              <option>50 per page</option>
-            </select>
-          </div>
+          <div className="flex items-center gap-2"></div>
         </div>
       </div>
       <div className="overflow-x-auto">

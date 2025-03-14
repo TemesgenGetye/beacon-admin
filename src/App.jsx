@@ -9,6 +9,8 @@ import Beacons from './pages/Beacons';
 import Logs from './pages/Logs';
 import Messages from './pages/Messages';
 import Assigment from './pages/Assigment';
+import Setting from './pages/Setting';
+import Help from './pages/Help';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,6 +32,8 @@ function App() {
               <Route path="/beacons" element={<Beacons />} />
               <Route path="/logs" element={<Logs />} />
               <Route path="/messages" element={<Messages />} />
+              <Route path="/settings" element={<Setting />} />
+              <Route path="/help" element={<Help />} />
             </Routes>
           </main>
         </div>

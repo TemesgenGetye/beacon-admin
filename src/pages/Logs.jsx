@@ -1,30 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
-import DataTable from '../components/DataTable';
 import LineChart from '../components/LineChart';
 import { useDispatch, useSelector } from 'react-redux';
 import { getLogs } from '../Redux/thunks/logsThunk';
 import { logData, logError, logLoading } from '../Redux/slices/logSlice';
-import { singleDataBeacon } from '../Redux/slices/beaconSlice';
-import { getBeacon } from '../Redux/thunks/beaconThunk';
+
 import DataTableLogsMessage from '../components/DataTableLogsMessage';
 
-const timeframeData = [
-  {
-    name: 'Jan 1',
-    logs: 4000,
-    success: 2400,
-    failed: 2400,
-  },
-];
-
-// {
-//   "beacon_id": "e7f0ebe1-7a8f-4846-9ccf-581371452fa9",
-//   "log_id": 1,
-//   "timestamp": "2025-02-17T06:27:03.324835Z",
-//   "advertisement_title": "YBS Commissioning",
-//   "advertisement_content": "We are offering an Expert services in commissioning works, ensuring efficiency and reliability in various operations."
-// }
 const columns = [
   { key: 'log_id', header: 'ID' },
   { key: 'advertisement_title', header: 'Advertisement' },
@@ -45,7 +27,7 @@ const columns = [
     render: row => (
       <div className="flex items-center">
         <Calendar className="h-4 w-4 text-gray-400 mr-1" />
-        {row.timestamp}
+        {new Date(row.timestamp).toLocaleString()}
       </div>
     ),
   },
@@ -67,9 +49,44 @@ const Logs = () => {
     dispatch(getLogs());
   }, [dispatch]);
 
+  const totalLogs = logs?.length || 0;
+  const successLogs = logs?.length || 0;
+  const failedLogs = 0;
+  const successRate = totalLogs > 0 ? ((successLogs / totalLogs) * 100).toFixed(1) : 0;
+  const impressions = 0;
+  const clicks = 0;
+
+  const generateTimeframeData = () => {
+    if (!logs || logs.length === 0) {
+      return [{ name: 'No Data', logs: 0, success: 0, failed: 0 }];
+    }
+
+    const now = new Date();
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(now.getDate() - 7);
+
+    const logsByDay = logs.reduce((acc, log) => {
+      const logDate = new Date(log.timestamp);
+      if (logDate >= sevenDaysAgo) {
+        const dayKey = logDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        acc[dayKey] = acc[dayKey] || { name: dayKey, logs: 0, success: 0, failed: 0 };
+        acc[dayKey].logs += 1;
+        acc[dayKey].success += 1;
+      }
+      return acc;
+    }, {});
+
+    return Object.values(logsByDay).length > 0
+      ? Object.values(logsByDay)
+      : [{ name: 'No Data', logs: 0, success: 0, failed: 0 }];
+  };
+
+  const timeframeData = generateTimeframeData();
+
   function handleDeletes(id) {
     console.log(id);
   }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -103,33 +120,31 @@ const Logs = () => {
       {/* Log Stats */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
         <div className="bg-white rounded-lg shadow p-5">
-          <p className="text-sm font-medium text-gray-500">Total Logs</p>
-          {/* <p className="text-2xl font-semibold mt-1">{logStats.total}</p> */}
+          <p className="text-sm font-medium text-forth">Total Logs</p>
+          <p className="text-2xl font-semibold mt-1">{totalLogs}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-5">
-          <p className="text-sm font-medium text-gray-500">Success Rate</p>
-          <p className="text-2xl font-semibold mt-1">
-            {/* {((logStats.success / logStats.total) * 100).toFixed(1)}% */}
-          </p>
+          <p className="text-sm font-medium text-forth">Success Rate</p>
+          <p className="text-2xl font-semibold mt-1">{successRate}%</p>
         </div>
         <div className="bg-white rounded-lg shadow p-5">
-          <p className="text-sm font-medium text-gray-500">Failed</p>
-          {/* <p className="text-2xl font-semibold mt-1">{logStats.failed}</p> */}
+          <p className="text-sm font-medium text-forth">Failed</p>
+          <p className="text-2xl font-semibold mt-1">{failedLogs}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-5">
-          <p className="text-sm font-medium text-gray-500">Impressions</p>
-          {/* <p className="text-2xl font-semibold mt-1">{logStats.impressions}</p> */}
+          <p className="text-sm font-medium text-forth">Impressions</p>
+          <p className="text-2xl font-semibold mt-1">{impressions}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-5">
-          <p className="text-sm font-medium text-gray-500">Clicks</p>
-          {/* <p className="text-2xl font-semibold mt-1">{logStats.clicks}</p> */}
+          <p className="text-sm font-medium text-forth">Clicks</p>
+          <p className="text-2xl font-semibold mt-1">{clicks}</p>
         </div>
       </div>
 
       {/* Log Timeframe Chart */}
       <LineChart
         data={timeframeData}
-        title="Log Activity (Last 24 Hours)"
+        title="Log Activity (Last 7 Days)"
         dataKeys={timeframeChartKeys}
       />
 
