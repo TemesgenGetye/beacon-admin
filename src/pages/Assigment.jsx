@@ -1,11 +1,11 @@
 import { ChevronDown, Filter, Plus, Search } from 'lucide-react';
 import React, { useState } from 'react';
-import AssignmentList from '../features/assignment/assignmentList';
 import { useAssignmentModel } from '../context/AssignmentContext';
 import AssignmentModal from '../features/assignment/AssignmentModel';
 import { createAssignment, getAdvertWithBeacons } from '../Redux/thunks/assignmentThunk';
 import { useDispatch } from 'react-redux';
 import AssignmentModelShow from '../features/assignment/AssignmentModelShow';
+import AssignmentList from '../features/assignment/AssignmentList';
 
 const Assigment = () => {
   const [search, setSearch] = useState('');
