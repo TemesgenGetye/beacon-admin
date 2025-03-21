@@ -14,7 +14,7 @@ const columns = [
   {
     key: 'title',
     header: 'Title',
-    width: '300px',
+    width: '150px',
   },
   {
     key: 'is_active',
@@ -33,25 +33,24 @@ const columns = [
     },
   },
   {
-    key: 'start_date',
-    header: 'Start Date',
-    width: '150px',
-    render: row => new Date(row.start_date).toLocaleDateString(),
-  },
-  {
-    key: 'end_date',
-    header: 'End Date',
-    width: '150px',
-    render: row => new Date(row.end_date).toLocaleDateString(),
-  },
-  {
     key: 'content',
     header: 'Content',
+    width: '300px',
     render: row => (
       <div className="max-w-md truncate" title={row.content}>
         {row.content}
       </div>
     ),
+  },
+  {
+    key: 'image',
+    header: 'Image',
+    width: '100px',
+    render: row => {
+      <div className="flex items-center gap-2">
+        <img src={row.media_file || '/logo.jpg'} alt="image" className="h-10 w-10 rounded-full" />
+      </div>;
+    },
   },
 ];
 

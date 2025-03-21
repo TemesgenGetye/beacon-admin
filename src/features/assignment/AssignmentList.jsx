@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAdvertWithBeacons, getAssignments } from '../../Redux/thunks/assignmentThunk';
+import {
+  deleteAssignment,
+  getAdvertWithBeacons,
+  getAssignments,
+} from '../../Redux/thunks/assignmentThunk';
 import {
   advertWithBeacons,
   assignmentData,
   assignmentError,
   assignmentLoading,
 } from '../../Redux/slices/assignmnetSlice';
+import { beaconData } from '../../Redux/slices/beaconSlice'; // Adjust import based on your structure
 import DataTableAssignment from './DataTableAssignment';
 import { useAssignmentModel } from '../../context/AssignmentContext';
 
@@ -38,9 +43,16 @@ const columns = [
     render: row => new Date(row.assigned_at).toLocaleDateString(),
   },
   {
+    key: 'start_date',
+    header: 'Start Date',
+    width: '150px',
+    render: row => new Date(row.start_date).toLocaleDateString(),
+  },
+  {
     key: 'end_date',
     header: 'End Date',
     width: '150px',
+    render: row => new Date(row.end_date).toLocaleDateString(),
   },
 ];
 
@@ -49,8 +61,8 @@ function AssignmentList({ dropdown, search }) {
   const assignments = useSelector(assignmentData);
   const isLoading = useSelector(assignmentLoading);
   const error = useSelector(assignmentError);
-  const advertswithbeacons = useSelector(advertWithBeacons);
-  const [openShow, setOpenShow] = useState(false);
+  const advertsWithBeacons = useSelector(advertWithBeacons);
+  const beacons = useSelector(beaconData);
   const [formattedAssignments, setFormattedAssignments] = useState([]);
 
   const { handleOpenModal, setShow, setModalMode } = useAssignmentModel();
@@ -61,30 +73,57 @@ function AssignmentList({ dropdown, search }) {
   }, [dispatch]);
 
   useEffect(() => {
-    if (advertswithbeacons && advertswithbeacons.length > 0) {
-      const transformedData = [];
+    if (
+      assignments &&
+      assignments.length > 0 &&
+      advertsWithBeacons &&
+      advertsWithBeacons.length > 0 &&
+      beacons
+    ) {
+      const beaconMap = new Map(
+        beacons.map(b => [b.beacon_id, { name: b.name, location: b.location_name }])
+      );
 
-      advertswithbeacons.forEach(advert => {
-        if (advert.beacons && advert.beacons.length > 0) {
-          advert.beacons.forEach(beacon => {
-            const assignmentId = `${beacon.beacon_id.substring(0, 4)}-${advert.advertisement_id.substring(0, 4)}`;
-            transformedData.push({
-              assignment_id: assignmentId,
-              beacon: beacon.name,
-              location: beacon.location_name,
-              advertisement: advert.title,
-              assigned_at: advert.start_date,
-              advertisement_id: advert.advertisement_id,
-              beacon_id: beacon.beacon_id,
-              start_date: advert.start_date,
-              end_date: advert.end_date,
-            });
-          });
-        }
+      const advertMap = new Map(
+        advertsWithBeacons.map(ad => [
+          ad.advertisement_id,
+          {
+            title: ad.title,
+            beacons: ad.beacons.reduce((acc, b) => {
+              acc[b.beacon.beacon_id || b.beacon] = {
+                name: b.beacon.name,
+                beacon_id: b.beacon.beacon_id || b.beacon,
+                location: b.beacon.location_name,
+                start_date: b.start_date,
+                end_date: b.end_date,
+              };
+              return acc;
+            }, {}),
+          },
+        ])
+      );
+
+      const transformedData = assignments.map(assignment => {
+        const advert = advertMap.get(assignment.advertisement);
+        const beaconInfo = advert?.beacons[assignment.beacon] || {};
+        const beaconFromStore = beaconMap.get(assignment.beacon) || {};
+
+        return {
+          assignment_id: assignment.assignment_id,
+          beacon: beaconFromStore.name || beaconInfo.name || assignment.beacon,
+          beacon_id: beaconFromStore.beacon_id || beaconInfo.beacon_id || assignment.beacon,
+          advertisement_id: advert?.advertisement_id || assignment.advertisement,
+          start_date: assignment.start_date,
+          end_date: assignment.end_date,
+          location: beaconFromStore.location || beaconInfo.location || 'Unknown',
+          advertisement: advert?.title || 'Unknown',
+          assigned_at: assignment.assigned_at,
+        };
       });
+
       setFormattedAssignments(transformedData);
     }
-  }, [advertswithbeacons]);
+  }, [assignments, advertsWithBeacons, beacons]);
 
   const filteredAssignments = formattedAssignments.filter(assignment => {
     const matchesDropdown =
@@ -94,12 +133,11 @@ function AssignmentList({ dropdown, search }) {
           ? new Date(assignment.end_date) >= new Date()
           : new Date(assignment.end_date) < new Date();
 
-    // Filter by search term if provided
     const matchesSearch = !search
       ? true
-      : assignment.advertisement.toLowerCase().includes(search.toLowerCase()) ||
-        assignment.beacon.toLowerCase().includes(search.toLowerCase()) ||
-        assignment.location.toLowerCase().includes(search.toLowerCase());
+      : (assignment.advertisement?.toLowerCase() || '').includes(search.toLowerCase()) ||
+        (assignment.beacon?.toLowerCase() || '').includes(search.toLowerCase()) ||
+        (assignment.location?.toLowerCase() || '').includes(search.toLowerCase());
 
     return matchesDropdown && matchesSearch;
   });
@@ -143,7 +181,7 @@ function AssignmentList({ dropdown, search }) {
         }}
         idKey="assignment_id"
         handleOpenModal={handleOpenModal}
-        handleDelete={id => console.log('Delete', id)}
+        handleDelete={id => dispatch(deleteAssignment(id))}
       />
     </div>
   );

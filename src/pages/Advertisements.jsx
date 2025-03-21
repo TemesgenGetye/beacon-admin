@@ -16,31 +16,14 @@ const Advertisements = () => {
     useAdvertModel();
 
   const dispatch = useDispatch();
-  const advert = useSelector(advertData);
-  const Loading = useSelector(advertLoading);
-  const Error = useSelector(advertError);
 
-  const handleAddAdvert = async data => {
-    const createData = {
-      ...data,
-      start_date: data.start_date.toISOString(),
-      end_date: data.end_date.toISOString(),
-      tempId: Date.now(),
-    };
-    await dispatch(createAdvert(createData)).unwrap();
+  const handleAddAdvert = async formData => {
+    await dispatch(createAdvert(formData)).unwrap();
     handleCloseModal();
   };
 
   const handleUpdateAdvert = data => {
-    const advertData = {
-      advertisement_id: data.advertisement_id,
-      title: data.title,
-      content: data.content,
-      start_date: data.start_date.toISOString(),
-      end_date: data.end_date.toISOString(),
-      is_active: data.is_active,
-    };
-    dispatch(updateAdvert(advertData));
+    dispatch(updateAdvert(data)).unwrap();
     handleCloseModal();
   };
 

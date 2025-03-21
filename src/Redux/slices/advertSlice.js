@@ -54,35 +54,18 @@ const advertSlice = createSlice({
         state.error = action.payload;
       })
       // advert create 🔥🔥🔥🔥🔥🔥
-      .addCase(createAdvert.pending, (state, action) => {
-        //state.isLoading = true;
+      .addCase(createAdvert.pending, state => {
+        state.isLoading = true;
         state.error = null;
-        const tempId = Date.now();
-        const tempAdvert = { ...action.meta.arg, tempId, advertisement_id: `temp-${tempId}` };
-        state.adverts.push(tempAdvert);
       })
       .addCase(createAdvert.fulfilled, (state, action) => {
-        const tempIndex = state.adverts.findIndex(ad => ad.tempId === action.meta.arg.tempId);
-        if (tempIndex !== -1) {
-          state.adverts[tempIndex] = { ...action.payload };
-        } else {
-          // Remove any temp advert with matching data, then add payload
-          state.adverts = state.adverts.filter(
-            ad =>
-              !(
-                ad.tempId &&
-                ad.title === action.payload.title &&
-                ad.content === action.payload.content
-              )
-          );
-          state.adverts.push({ ...action.payload });
-        }
         state.isLoading = false;
+        state.adverts.push({ ...action.payload });
       })
       .addCase(createAdvert.rejected, (state, action) => {
-        state.adverts = state.adverts.filter(ad => ad.tempId !== action.meta.arg.tempId);
         state.isLoading = false;
         state.error = action.payload;
+        console.log('Rejected - Error:', action.payload);
       })
       // advert update 🎨🎨🎨🎨🎨🎨
       .addCase(updateAdvert.pending, (state, action) => {
@@ -116,7 +99,7 @@ const advertSlice = createSlice({
       })
       // advert delete 🗑🗑🗑🗑🗑🗑
       .addCase(deleteAdvert.pending, (state, action) => {
-        // state.isLoading = true;
+        state.isLoading = true;
         state.error = null;
         const index = state.adverts.findIndex(ad => ad.advertisement_id === action.meta.arg);
         if (index !== -1) state.adverts.splice(index, 1);

@@ -2,7 +2,11 @@ import { ChevronDown, Filter, Plus, Search } from 'lucide-react';
 import React, { useState } from 'react';
 import { useAssignmentModel } from '../context/AssignmentContext';
 import AssignmentModal from '../features/assignment/AssignmentModel';
-import { createAssignment, getAdvertWithBeacons } from '../Redux/thunks/assignmentThunk';
+import {
+  createAssignment,
+  getAdvertWithBeacons,
+  updateAssignment,
+} from '../Redux/thunks/assignmentThunk';
 import { useDispatch } from 'react-redux';
 import AssignmentModelShow from '../features/assignment/AssignmentModelShow';
 import AssignmentList from '../features/assignment/AssignmentList';
@@ -19,7 +23,6 @@ const Assigment = () => {
     modalMode,
     currentAssignment,
     show,
-    handleShowModel,
     handleCloseModel,
     showModalForAssignment,
   } = useAssignmentModel();
@@ -33,9 +36,9 @@ const Assigment = () => {
   }
 
   function handleUpdateAssignment(data) {
-    // dispatch(updateAssignment(data));
-    // dispatch(getAdvertWithBeacons());
-    // handleCloseModal();
+    dispatch(updateAssignment(data));
+    dispatch(getAdvertWithBeacons());
+    handleCloseModal();
   }
   return (
     <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
@@ -99,6 +102,7 @@ const Assigment = () => {
           </button>
         </div>
       </div>
+
       <AssignmentList dropdown={dropdown} search={search} />
       <AssignmentModal
         isOpen={isModalOpen}

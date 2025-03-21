@@ -1,5 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createAssignment, getAdvertWithBeacons, getAssignments } from '../thunks/assignmentThunk';
+import {
+  createAssignment,
+  deleteAssignment,
+  getAdvertWithBeacons,
+  getAssignments,
+  updateAssignment,
+} from '../thunks/assignmentThunk';
 
 const assignmentSlice = createSlice({
   name: 'assignment',
@@ -58,6 +64,43 @@ const assignmentSlice = createSlice({
         state.error = null;
       })
       .addCase(createAssignment.rejected, (state, action) => {
+        state.assignments = [];
+        state.isLoading = false;
+        state.error = action.message;
+      })
+      // update assignment 🔥🔥🔥🔥🔥🔥
+      .addCase(updateAssignment.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateAssignment.fulfilled, (state, action) => {
+        state.assignments = state.assignments.map(assignment => {
+          if (assignment.assignment_id === action.meta.arg.assignment_id) {
+            return action.payload;
+          }
+          return assignment;
+        });
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(updateAssignment.rejected, (state, action) => {
+        state.assignments = [];
+        state.isLoading = false;
+        state.error = action.message;
+      })
+      // delete assignment 🔥🔥🔥
+      .addCase(deleteAssignment.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteAssignment.fulfilled, (state, action) => {
+        state.assignments = state.assignments.filter(
+          assignment => assignment.assignment_id !== action.meta.arg
+        );
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(deleteAssignment.rejected, (state, action) => {
         state.assignments = [];
         state.isLoading = false;
         state.error = action.message;

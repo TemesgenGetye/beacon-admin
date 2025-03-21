@@ -4,6 +4,7 @@ import beaconReducer from '../slices/beaconSlice';
 import assignmentReducer from '../slices/assignmnetSlice';
 import logReducer from '../slices/logSlice';
 import messageReducer from '../slices/messageSlice';
+import dashbordReducer from '../slices/dashbordSlice';
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     assignment: assignmentReducer,
     log: logReducer,
     message: messageReducer,
+    dashbord: dashbordReducer,
   },
 });
 

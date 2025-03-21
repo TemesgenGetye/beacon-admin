@@ -31,31 +31,30 @@ const fetchAPI = async (endpoint, options = {}) => {
 
 // Assignments
 export const fetchAssignments = async () => {
-  return fetchAPI('/advertisements/assignments/');
+  return fetchAPI('/assignments/');
 };
 
 export const fetchAdvertWithBeacons = async () => {
-  return fetchAPI(`/advertisements-with-beacons/`);
+  return fetchAPI(`/advertisements/beacons/`);
 };
 
 export const createAssignmentApi = async data => {
-  console.log('data send to the backend', data);
-  return fetchAPI('/advertisements/assignments/', {
+  return fetchAPI('/assignments/', {
     method: 'POST',
     body: JSON.stringify(data),
   });
 };
 
 export const updateAssignmentApi = async data => {
-  console.log('data send to the backend', data);
-  return fetchAPI(`/advertisements/assignments/${data.beacon_id}/`, {
+  console.log('data sent to backend', data);
+  return fetchAPI(`/assignments/${data.assignment_id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   });
 };
 
 export const deleteAssignmentApi = async id => {
-  return fetchAPI(`/advertisements/assignments/${id}/`, {
+  return fetchAPI(`/assignments/${id}/`, {
     method: 'DELETE',
   });
 };

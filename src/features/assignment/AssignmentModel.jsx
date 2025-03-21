@@ -108,10 +108,11 @@ export default function CreateAssignmentModal({
     e.preventDefault();
     if (validateForm()) {
       const assignmentData = {
+        assignment_id: formData?.assignment_id,
         beacon: formData.beacon_id,
         advertisement: formData.advertisement_id,
-        // start_date: formData.start_date,
-        // end_date: formData.end_date,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
       };
 
       if (typeof onCreateAssignment === 'function' && mode === 'edit') {

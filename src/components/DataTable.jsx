@@ -70,7 +70,19 @@ const DataTable = ({
                     key={`${row[idKey] || rowIndex}-${column.key}`}
                     className="px-6 py-4 whitespace-nowrap text-sm text-forth"
                   >
-                    {column.render ? column.render(row) : row[column.key] || '-'}
+                    {column.key === 'image' ? (
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={row.media_file || '/logo.jpg'} // Note the leading slash
+                          alt="image"
+                          className="h-10 w-10 rounded-full"
+                        />
+                      </div>
+                    ) : column.render ? (
+                      column.render(row)
+                    ) : (
+                      row[column.key] || '-'
+                    )}
                   </td>
                 ))}
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

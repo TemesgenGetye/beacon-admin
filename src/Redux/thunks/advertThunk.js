@@ -44,7 +44,7 @@ export const updateAdvert = createAsyncThunk(
   'advert/updateAdvert',
   async (advert, { rejectWithValue }) => {
     try {
-      const data = await updateAdvertisement(advert.advertisement_id, advert);
+      const data = await updateAdvertisement(advert);
       return data;
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to update advert');

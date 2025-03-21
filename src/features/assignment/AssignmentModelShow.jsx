@@ -86,25 +86,9 @@ function AssignmentModelShow({ isOpen, onClose, assignment }) {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-forth mb-1">Start Date</p>
-                      <p className="px-4 py-2 border border-gray-300 rounded-xl bg-white">
-                        {formatDate(singleAdvertData?.start_date)}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-medium text-forth mb-1">End Date</p>
-                      <p className="px-4 py-2 border border-gray-300 rounded-xl bg-white">
-                        {formatDate(singleAdvertData?.end_date)}
-                      </p>
-                    </div>
-                  </div>
-
                   <div className="flex items-center">
                     <div
-                      className={`h-4 w-4 rounded ${singleAdvertData?.is_active ? 'bg-primary' : 'bg-gray-300'}`}
+                      className={`h-4 w-4 rounded ${singleAdvertData?.is_active ? 'bg-green-600' : 'bg-gray-300'}`}
                     ></div>
                     <p className="ml-2 text-sm text-forth">
                       {singleAdvertData?.is_active ? 'Active' : 'Inactive'}
@@ -149,7 +133,7 @@ function AssignmentModelShow({ isOpen, onClose, assignment }) {
 
                   <div className="flex items-center">
                     <div
-                      className={`h-4 w-4 rounded ${singleBeaconData?.status === 'active' ? 'bg-primary' : 'bg-gray-300'}`}
+                      className={`h-4 w-4 rounded ${singleBeaconData?.status === 'active' ? 'bg-green-600' : 'bg-gray-300'}`}
                     ></div>
                     <p className="ml-2 text-sm text-forth">
                       {singleBeaconData?.status

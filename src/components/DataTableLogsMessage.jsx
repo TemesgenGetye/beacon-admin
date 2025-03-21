@@ -49,7 +49,18 @@ const DataTableLogsMessage = ({ data, columns, title, pagination, handleDelete, 
               </th>
             </tr>
           </thead>
+
           <tbody className="bg-white divide-y divide-gray-200">
+            {paginatedData.length === 0 && (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="px-6 py-4 whitespace-nowrap text-sm text-forth"
+                >
+                  No data found 😞
+                </td>
+              </tr>
+            )}
             {paginatedData?.map((row, rowIndex) => (
               <tr key={row[idKey] || rowIndex} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

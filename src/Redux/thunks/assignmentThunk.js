@@ -3,6 +3,8 @@ import {
   fetchAdvertWithBeacons,
   fetchAssignments,
   createAssignmentApi,
+  updateAssignmentApi,
+  deleteAssignmentApi,
 } from '../../service/assignmentApi';
 
 export const getAssignments = createAsyncThunk(
@@ -57,27 +59,27 @@ export const createAssignment = createAsyncThunk(
 //   }
 // );
 
-// export const updateAssignment = createAsyncThunk(
-//   'assignment/updateAssignment',
-//   async (assignment, { rejectWithValue }) => {
-//     try {
-//       const data = await updateAssignment(assignment.assignment_id, assignment);
-//       return data;
-//     } catch (error) {
-//       return rejectWithValue(error.message || 'Failed to update assignment');
-//     }
-//   }
-// );
+export const updateAssignment = createAsyncThunk(
+  'assignment/updateAssignment',
+  async (assignment, { rejectWithValue }) => {
+    try {
+      const data = await updateAssignmentApi(assignment);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message || 'Failed to update assignment');
+    }
+  }
+);
 
-// export const deleteAssignment = createAsyncThunk(
-//   'assignment/deleteAssignment',
-//   async (id, { rejectWithValue }) => {
-//     try {
-//       const data = await deleteAssignment(id);
-//       return { assignment_id: id };
-//     } catch (error) {
-//       console.log('Thunk error:', error.message);
-//       return rejectWithValue(error.message || 'Failed to delete assignment');
-//     }
-//   }
-// );
+export const deleteAssignment = createAsyncThunk(
+  'assignment/deleteAssignment',
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await deleteAssignmentApi(id);
+      return { assignment_id: id };
+    } catch (error) {
+      console.log('Thunk error:', error.message);
+      return rejectWithValue(error.message || 'Failed to delete assignment');
+    }
+  }
+);

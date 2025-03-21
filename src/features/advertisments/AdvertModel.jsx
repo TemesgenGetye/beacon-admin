@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, Calendar } from 'lucide-react';
-import DatePicker from 'react-datepicker';
+import { useState, useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const AdvertModal = ({
@@ -15,19 +14,20 @@ const AdvertModal = ({
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    start_date: new Date(),
-    end_date: new Date(),
+    image: null,
+    imagePreview: null,
     is_active: false,
   });
   const [errors, setErrors] = useState({});
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (advert === null) {
       setFormData({
         title: '',
         content: '',
-        start_date: new Date(),
-        end_date: new Date(),
+        image: null,
+        imagePreview: null,
         is_active: false,
       });
     }
@@ -35,8 +35,8 @@ const AdvertModal = ({
     if (advert) {
       setFormData({
         ...advert,
-        start_date: advert.start_date ? new Date(advert.start_date) : new Date(),
-        end_date: advert.end_date ? new Date(advert.end_date) : new Date(),
+        image: null, // New image will be null unless changed
+        imagePreview: advert.image_url || null, // Assuming your advert object has an image_url
       });
     }
   }, [advert]);
@@ -48,7 +48,6 @@ const AdvertModal = ({
       [name]: type === 'checkbox' ? checked : value,
     });
 
-    // Clear error when field is edited
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -57,31 +56,36 @@ const AdvertModal = ({
     }
   };
 
-  const handleDateChange = (date, field) => {
-    setFormData({
-      ...formData,
-      [field]: date,
-    });
-
-    // Clear error when date is changed
-    if (errors[field]) {
-      setErrors({
-        ...errors,
-        [field]: null,
+  const handleImageChange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setFormData({
+        ...formData,
+        image: file,
+        imagePreview: previewUrl,
       });
+      if (errors.image) {
+        setErrors({
+          ...errors,
+          image: null,
+        });
+      }
+    }
+  };
+
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    const now = new Date();
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.content.trim()) newErrors.content = 'Content is required';
-    if (!formData.start_date) newErrors.start_date = 'Start date is required';
-    else if (formData.start_date < now) newErrors.start_date = 'Start date cannot be in the past';
-    if (!formData.end_date) newErrors.end_date = 'End date is required';
-    else if (formData.end_date <= formData.start_date)
-      newErrors.end_date = 'End date must be after start date';
+    if (!formData.image && !formData.imagePreview && mode === 'create')
+      newErrors.image = 'Image is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -89,11 +93,19 @@ const AdvertModal = ({
   const handleSave = e => {
     e.preventDefault();
     if (validateForm()) {
+      const submitData = new FormData();
+      submitData.append('title', formData.title);
+      submitData.append('content', formData.content);
+      submitData.append('is_active', formData.is_active.toString());
+      if (formData.image) {
+        submitData.append('media_file', formData.image);
+      }
       onClose();
       if (mode === 'create' && typeof handleAddAdvert === 'function') {
-        handleAddAdvert(formData);
+        handleAddAdvert(submitData);
       } else if (mode === 'edit' && typeof handleUpdateAdvert === 'function') {
-        handleUpdateAdvert(formData);
+        submitData.append('advertisement_id', advert.advertisement_id);
+        handleUpdateAdvert(submitData);
       }
     }
   };
@@ -102,15 +114,12 @@ const AdvertModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Overlay */}
       <div
         className="absolute inset-0 bg-midnight bg-opacity-50 backdrop-blur-sm"
         onClick={onClose}
       ></div>
 
-      {/* Modal */}
       <div className="relative bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] overflow-hidden">
-        {/* Header */}
         <div className="flex items-center justify-between text-forth px-6 py-4">
           <h2 className="text-xl font-semibold text-midnight">
             {advert?.advertisement_id ? 'Edit Advertisement' : 'Create Advertisement'}
@@ -120,14 +129,12 @@ const AdvertModal = ({
           </button>
         </div>
 
-        {/* Body */}
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-130px)]">
           <form>
             <div className="space-y-6">
-              {/* Title */}
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-forth mb-1">
-                  Titles
+                  Title
                 </label>
                 <input
                   type="text"
@@ -144,7 +151,6 @@ const AdvertModal = ({
                 {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title}</p>}
               </div>
 
-              {/* Content */}
               <div>
                 <label htmlFor="content" className="block text-sm font-medium text-forth mb-1">
                   Content
@@ -164,61 +170,104 @@ const AdvertModal = ({
                 {errors.content && <p className="mt-1 text-sm text-red-500">{errors.content}</p>}
               </div>
 
-              {/* Dates */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Start Date */}
-                <div>
-                  <label htmlFor="start_date" className="block text-sm font-medium text-forth mb-1">
-                    Start Date
-                  </label>
-                  <div
-                    className={`relative ${errors.start_date ? 'border-red-500 rounded-xl' : ''}`}
-                  >
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Calendar className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <DatePicker
-                      selected={formData.start_date}
-                      onChange={date => handleDateChange(date, 'start_date')}
-                      className={`w-full pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors ${
-                        errors.start_date ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      dateFormat="yyyy-MM-dd"
+              <div>
+                <label htmlFor="image" className="block text-sm font-medium text-forth mb-1">
+                  Image
+                </label>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Upload Box */}
+                  <div className="relative">
+                    <input
+                      type="file"
+                      id="image"
+                      name="image"
+                      onChange={handleImageChange}
+                      accept="image/*"
+                      className="hidden"
                       disabled={show}
+                      ref={fileInputRef}
                     />
+
+                    <div
+                      onClick={() => !show && triggerFileInput()}
+                      className={`border-2 border-dashed rounded-xl h-[180px] flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors ${
+                        errors.image ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-gray-500"
+                          >
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                          </svg>
+                        </div>
+                        <p className="text-sm font-medium text-gray-700">Click to upload</p>
+                        <p className="text-xs text-gray-500">SVG, PNG, JPG or GIF</p>
+                      </div>
+                    </div>
                   </div>
-                  {errors.start_date && (
-                    <p className="mt-1 text-sm text-red-500">{errors.start_date}</p>
-                  )}
+
+                  {/* Preview Box */}
+                  <div className="border rounded-xl p-2 flex items-center justify-center bg-gray-50 h-[180px]">
+                    {formData.imagePreview ? (
+                      <div className="relative w-full h-full flex items-center justify-center">
+                        <img
+                          src={formData.imagePreview || '/placeholder.svg'}
+                          alt="Preview"
+                          className="max-w-full h-auto rounded-lg max-h-[160px] object-contain"
+                        />
+                        {!show && (
+                          <button
+                            type="button"
+                            className="absolute top-2 right-2 h-6 w-6 bg-red-500 text-white rounded-full flex items-center justify-center"
+                            onClick={e => {
+                              e.preventDefault();
+                              setFormData({ ...formData, image: null, imagePreview: null });
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-gray-400">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="48"
+                          height="48"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="mb-2"
+                        >
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                          <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <p className="text-sm">No image preview</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* End Date */}
-                <div>
-                  <label htmlFor="end_date" className="block text-sm font-medium text-forth mb-1">
-                    End Date
-                  </label>
-                  <div className={`relative ${errors.end_date ? 'border-red-500 rounded-xl' : ''}`}>
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Calendar className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <DatePicker
-                      selected={formData.end_date}
-                      onChange={date => handleDateChange(date, 'end_date')}
-                      className={`w-full pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-colors ${
-                        errors.end_date ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      dateFormat="yyyy-MM-dd"
-                      minDate={formData.start_date}
-                      disabled={show}
-                    />
-                  </div>
-                  {errors.end_date && (
-                    <p className="mt-1 text-sm text-red-500">{errors.end_date}</p>
-                  )}
-                </div>
+                {errors.image && <p className="mt-1 text-sm text-red-500">{errors.image}</p>}
               </div>
 
-              {/* Active Status */}
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -237,7 +286,6 @@ const AdvertModal = ({
           </form>
         </div>
 
-        {/* Footer */}
         <div className="flex items-center justify-end px-6 py-4">
           <button
             type="button"

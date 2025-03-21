@@ -36,11 +36,11 @@ const fetchAPI = async (endpoint, options = {}) => {
 };
 
 export const fetchMessages = async () => {
-  return await fetchAPI('/messages/');
+  return await fetchAPI('/beacon-messages/');
 };
 
 export const deleteMessageApi = async id => {
-  return await fetchAPI(`/messages/${id}/`, {
+  return await fetchAPI(`/beacon-messages/${id}/`, {
     method: 'DELETE',
   });
 };
