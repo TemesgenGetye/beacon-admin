@@ -50,19 +50,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <button
-            className="hidden lg:block text-gray-400 hover:text-gray-600"
-            onClick={() => setCollapsed(!collapsed)}
-          >
+          <div className="hidden lg:block text-gray-400 hover:text-gray-600 cursor-pointer">
             <div className="flex items-center justify-between h-16 px-6 py-20">
-              <div className="flex items-center">
+              <button className="flex items-center" onClick={() => setCollapsed(!collapsed)}>
                 <div className="flex items-center justify-center">
                   <Radio className="h-10 w-10 text-primary" />
                 </div>
                 {!collapsed && (
                   <span className="ml-3 text-xl font-medium text-primary">Beacon Dash</span>
                 )}
-              </div>
+              </button>
               <div className="flex items-center">
                 <button
                   className="text-gray-400 hover:text-gray-600 lg:hidden"
@@ -72,7 +69,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 </button>
               </div>
             </div>
-          </button>
+          </div>
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-6">

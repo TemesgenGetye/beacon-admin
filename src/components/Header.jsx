@@ -1,8 +1,18 @@
 import { Menu, Bell, User, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logoutSlice } from '../Redux/slices/authSlice';
 
 const Header = ({ sidebarOpen, setSidebarOpen }) => {
-  // const { user, logout } = useAuth();
+  const auth = useSelector(state => state.auth.isAuthenticated);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    dispatch(logoutSlice());
+    navigate('/login');
+  }
 
   return (
     <header className="sticky top-2 z-35">
@@ -26,11 +36,8 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
                 <section className="bg-white px-4 py-1 rounded-3xl flex items-center gap-2 ">
                   <div className="flex flex-col items-end">
                     <span className="text-[12px] font-medium text-gray-700">
-                      {/* {user?.name || 'Admin User'}
-                       */}
-                      Admin User
+                      {auth ? ' Admin User' : 'No User'}
                     </span>
-                    <span className="text-[9px] text-gray-500">Administrator</span>
                   </div>
                   <div className="h-10 w-10 rounded-lg  flex items-center justify-center">
                     <User className="h-6 w-5 " />
@@ -51,7 +58,7 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
                   {/* Logout */}
 
                   <button
-                    // onClick={logout}
+                    onClick={handleLogout}
                     className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                   >
                     <LogOut className="h-5 w-5" />

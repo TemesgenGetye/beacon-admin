@@ -1,12 +1,15 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { getUser } from '../Redux/thunks/authThunk';
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
+    username: 'erdey',
+    password: 'Erdey@1234',
   });
 
   const handleChange = e => {
@@ -19,8 +22,17 @@ const Login = () => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    navigate('./');
+
+    const { username, password } = formData;
+    dispatch(getUser({ username, password }))
+      .unwrap()
+      .then(() => {
+        navigate('/');
+      })
+      .catch(error => {
+        console.error('Login failed:', error);
+        navigate('/login');
+      });
   };
 
   return (
@@ -73,9 +85,6 @@ const Login = () => {
             <button
               type="submit"
               className="w-full bg-primary hover:bg-primary/60 text-white font-medium py-3 px-4 rounded-xl transition duration-200"
-              onClick={() => {
-                navigate('/');
-              }}
             >
               Login
             </button>

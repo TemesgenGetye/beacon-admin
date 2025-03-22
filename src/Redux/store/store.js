@@ -5,6 +5,7 @@ import assignmentReducer from '../slices/assignmnetSlice';
 import logReducer from '../slices/logSlice';
 import messageReducer from '../slices/messageSlice';
 import dashbordReducer from '../slices/dashbordSlice';
+import authReducer from '../slices/authSlice';
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     log: logReducer,
     message: messageReducer,
     dashbord: dashbordReducer,
+    auth: authReducer,
   },
 });
 

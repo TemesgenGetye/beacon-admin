@@ -2,6 +2,7 @@ import React, { useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
+import { useSelector } from 'react-redux';
 
 // Lazy-loaded pages
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -32,7 +33,7 @@ const MainLayout = ({ sidebarOpen, setSidebarOpen, children }) => (
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const isAuthenticated = true;
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
   return (
     <Router>
