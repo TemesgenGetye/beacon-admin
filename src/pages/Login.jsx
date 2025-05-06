@@ -8,8 +8,8 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
-    username: 'erdey',
-    password: 'Erdey@1234',
+    username: 'user1',
+    password: 'User1@1234',
   });
 
   const handleChange = e => {

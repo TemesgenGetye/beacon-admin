@@ -3,11 +3,13 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const fetchAPI = async (endpoint, options = {}) => {
   try {
     const url = `${BASE_URL}${endpoint}`;
+    const token = localStorage.getItem('accessToken');
     const response = await fetch(url, {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
         ...options.headers,
+        Authorization: token ? `Bearer ${token}` : '',
+        'Content-Type': 'application/json',
       },
     });
 
