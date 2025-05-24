@@ -38,14 +38,14 @@ const fetchAPI = async (endpoint, options = {}) => {
 };
 
 export const fetchToken = async data => {
-  return fetchAPI('/token/', {
+  return fetchAPI('/auth/login/', {
     method: 'POST',
     body: JSON.stringify(data),
   });
 };
 
 export const fetchRefresh = async data => {
-  return fetchAPI('/token/refresh/', {
+  return fetchAPI('/token/auth/token/refresh/', {
     method: 'POST',
     body: JSON.stringify(data),
   });
