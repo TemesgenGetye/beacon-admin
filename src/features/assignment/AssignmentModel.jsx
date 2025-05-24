@@ -94,11 +94,11 @@ export default function CreateAssignmentModal({
 
     if (!formData.beacon_id) newErrors.beacon_id = 'Beacon is required';
     if (!formData.advertisement_id) newErrors.advertisement_id = 'Advertisement is required';
-    if (!formData.start_date) newErrors.start_date = 'Start date is required';
-    else if (formData.start_date < now) newErrors.start_date = 'Start date cannot be in the past';
-    if (!formData.end_date) newErrors.end_date = 'End date is required';
-    else if (formData.end_date <= formData.start_date)
-      newErrors.end_date = 'End date must be after start date';
+    // if (!formData.start_date) newErrors.start_date = 'Start date is required';
+    // else if (formData.start_date < now) newErrors.start_date = 'Start date cannot be in the past';
+    // if (!formData.end_date) newErrors.end_date = 'End date is required';
+    // else if (formData.end_date <= formData.start_date)
+    //   newErrors.end_date = 'End date must be after start date';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
