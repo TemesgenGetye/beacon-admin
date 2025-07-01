@@ -7,15 +7,36 @@ import {
   updateAdvertisement,
 } from '../../service/advertApi';
 
-export const getAdverts = createAsyncThunk('advert/getAdverts', async (_, { rejectWithValue }) => {
-  try {
-    const data = await fetchAdvertisements();
-    return data;
-  } catch (error) {
-    const errorMessage = error.message || 'Unknown error occurred';
-    return rejectWithValue(errorMessage);
+// Track ongoing requests to prevent duplicates
+let ongoingGetAdvertsRequest = null;
+
+export const getAdverts = createAsyncThunk(
+  'advert/getAdverts',
+  async (_, { rejectWithValue, getState }) => {
+    // Check if we're already loading data
+    const state = getState();
+    if (state.advert.isLoading) {
+      // If already loading, wait for the existing request
+      if (ongoingGetAdvertsRequest) {
+        return ongoingGetAdvertsRequest;
+      }
+    }
+
+    try {
+      // Create a promise for this request
+      const requestPromise = fetchAdvertisements();
+      ongoingGetAdvertsRequest = requestPromise;
+
+      const data = await requestPromise;
+      ongoingGetAdvertsRequest = null;
+      return data;
+    } catch (error) {
+      ongoingGetAdvertsRequest = null;
+      const errorMessage = error.message || 'Unknown error occurred';
+      return rejectWithValue(errorMessage);
+    }
   }
-});
+);
 
 export const getAdvert = createAsyncThunk('advert/getAdvert', async (id, { rejectWithValue }) => {
   try {
@@ -31,6 +52,7 @@ export const createAdvert = createAsyncThunk(
   'advert/createAdvert',
   async (advert, { rejectWithValue }) => {
     try {
+      console.log('createAdvert:', advert);
       const data = await createAdvertisement(advert);
       return data;
     } catch (error) {

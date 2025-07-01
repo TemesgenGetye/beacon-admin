@@ -3,18 +3,28 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import { useSelector } from 'react-redux';
+import Dashboard from './pages/Dashboard';
+import Advertisements from './pages/Advertisements';
+import Beacons from './pages/Beacons';
+import Logs from './pages/Logs';
+import Messages from './pages/Messages';
+import Assigment from './pages/Assigment';
+import Setting from './pages/Setting';
+import Help from './pages/Help';
+import Login from './pages/Login';
+import NotFound from './pages/NotFound';
 
-// Lazy-loaded pages
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Advertisements = lazy(() => import('./pages/Advertisements'));
-const Beacons = lazy(() => import('./pages/Beacons'));
-const Logs = lazy(() => import('./pages/Logs'));
-const Messages = lazy(() => import('./pages/Messages'));
-const Assigment = lazy(() => import('./pages/Assigment'));
-const Setting = lazy(() => import('./pages/Setting'));
-const Help = lazy(() => import('./pages/Help'));
-const Login = lazy(() => import('./pages/Login'));
-const NotFound = lazy(() => import('./pages/NotFound'));
+// // Lazy-loaded pages
+// const Dashboard = lazy(() => import('./pages/Dashboard'));
+// const Advertisements = lazy(() => import('./pages/Advertisements'));
+// const Beacons = lazy(() => import('./pages/Beacons'));
+// const Logs = lazy(() => import('./pages/Logs'));
+// const Messages = lazy(() => import('./pages/Messages'));
+// const Assigment = lazy(() => import('./pages/Assigment'));
+// const Setting = lazy(() => import('./pages/Setting'));
+// const Help = lazy(() => import('./pages/Help'));
+// const Login = lazy(() => import('./pages/Login'));
+// const NotFound = lazy(() => import('./pages/NotFound'));
 
 const MainLayout = ({ sidebarOpen, setSidebarOpen, children }) => (
   <div className="flex h-screen overflow-hidden bg-secondary">

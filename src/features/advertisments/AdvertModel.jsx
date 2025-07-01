@@ -97,11 +97,19 @@ const AdvertModal = ({
       submitData.append('title', formData.title);
       submitData.append('content', formData.content);
       submitData.append('is_active', formData.is_active.toString());
+
+      // Add created_by if available (get from localStorage or context)
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user.id) {
+        submitData.append('created_by', user.id.toString());
+      }
+
       if (formData.image) {
         submitData.append('media_file', formData.image);
       }
       onClose();
       if (mode === 'create' && typeof handleAddAdvert === 'function') {
+        console.log('handleAddAdvert:', submitData);
         handleAddAdvert(submitData);
       } else if (mode === 'edit' && typeof handleUpdateAdvert === 'function') {
         submitData.append('advertisement_id', advert.advertisement_id);

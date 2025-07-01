@@ -22,6 +22,8 @@ const DataTable = ({
     handleDelete(id);
   };
 
+  console.log('beacons', data);
+
   return (
     <div className="overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200">

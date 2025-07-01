@@ -36,11 +36,15 @@ export default function CreateAssignmentModal({
   const isLoadingBeacons = useSelector(beaconLoading);
   const errorBeacons = useSelector(beaconError);
 
-  // Fetch data on component mount
+  // Fetch data on component mount only if not already available
   useEffect(() => {
-    dispatch(getAdverts());
-    dispatch(getBeacons());
-  }, [dispatch]);
+    if (!adverts?.length) {
+      dispatch(getAdverts());
+    }
+    if (!beacons?.length) {
+      dispatch(getBeacons());
+    }
+  }, [dispatch, adverts?.length, beacons?.length]);
 
   useEffect(() => {
     if (assignment === null) {

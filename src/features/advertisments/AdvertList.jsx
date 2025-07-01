@@ -47,9 +47,11 @@ const columns = [
     header: 'Image',
     width: '100px',
     render: row => {
-      <div className="flex items-center gap-2">
-        <img src={row.media_file || '/logo.jpg'} alt="image" className="h-10 w-10 rounded-full" />
-      </div>;
+      return (
+        <div className="flex items-center gap-2">
+          <img src={row.image_url || '/logo.jpg'} alt="image" className="h-10 w-10 rounded-full" />
+        </div>
+      );
     },
   },
 ];
@@ -61,9 +63,10 @@ function AdvertList({ dropdown, search }) {
   const error = useSelector(advertError);
   const { handleOpenModal, setShow, setModalMode } = useAdvertModel();
 
-  useEffect(() => {
-    if (!adverts.length) dispatch(getAdverts());
-  }, [dispatch, adverts.length]);
+  // Remove the useEffect that makes API calls since data is already fetched by parent components
+  // useEffect(() => {
+  //   if (!adverts?.length) dispatch(getAdverts());
+  // }, [dispatch, adverts?.length]);
 
   const filteredAdverts = adverts?.filter(advert => {
     const matchesDropdown =

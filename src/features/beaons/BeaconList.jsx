@@ -6,19 +6,29 @@ import { beaconData, beaconError, beaconLoading } from '../../Redux/slices/beaco
 import { deleteBeacon, getBeacons } from '../../Redux/thunks/beaconThunk';
 import { useBeaconModel } from '../../context/BeaconModelContext';
 
-// {
-//   "beacon_id": "279ec222-244d-433e-ae1a-07d2d14cd229",
-//   "name": "beacon 2",
-//   "minor": null,
-//   "major": null,
-//   "location_name": "Mexico",
-//   "signal_strength": null,
-//   "battery_status": null,
-//   "start_date": "2025-02-13T19:04:07.275211Z",
-//   "status": "Inactive",
-//   "latitude": null,
-//   "longitude": null
-// }
+function LocationName({ lat, lon }) {
+  const [location, setLocation] = useState('Loading...');
+
+  useEffect(() => {
+    // If coordinates are both zero, set to Unknown and return
+    if ((lat === 0 || lat === 0.0) && (lon === 0 || lon === 0.0)) {
+      setLocation('Unknown');
+      return;
+    }
+    if (!lat || !lon) {
+      setLocation('Unknown');
+      return;
+    }
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+      .then(res => res.json())
+      .then(data => {
+        setLocation(data.display_name || 'Unknown location');
+      })
+      .catch(() => setLocation('Unknown location'));
+  }, [lat, lon]);
+
+  return <span>{location}</span>;
+}
 
 const columns = [
   { key: 'beacon_id', header: 'Beacon ID' },
@@ -29,7 +39,7 @@ const columns = [
     render: row => (
       <div className="flex items-center justify-center">
         <MapPin className="h-4 w-4 text-gray-400 mr-1" />
-        {row.location_name}
+        <LocationName lat={row.latitude} lon={row.longitude} />
       </div>
     ),
   },

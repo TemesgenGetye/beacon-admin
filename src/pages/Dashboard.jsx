@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Radio, MonitorSmartphone, FileText, MessageSquare } from 'lucide-react';
 import MetricCard from '../components/MetricCard';
 import LineChart from '../components/LineChart';
@@ -33,27 +33,34 @@ const Dashboard = () => {
   const isLoadingLogs = useSelector(logLoading);
   const errorLogs = useSelector(logError);
 
-  // Calculate metrics from your data
-  const activeBeaconsCount = beacons.filter(beacon => beacon.status === 'Active').length;
-  const activeAdvertsCount = adverts.filter(advert => advert.is_active).length;
-  const totalLogs = logs.length;
-  const totalMessages = messages.length;
+  // Calculate metrics from your data - memoized to prevent unnecessary recalculations
+  const metrics = useMemo(() => {
+    const activeBeaconsCount = beacons.filter(beacon => beacon.status === 'Active').length;
+    const activeAdvertsCount = adverts.filter(advert => advert.is_active).length;
+    const totalLogs = logs.length;
+    const totalMessages = messages.length;
 
-  const metrics = {
-    activeBeacons: activeBeaconsCount,
-    activeAds: activeAdvertsCount,
-    totalLogs,
-    totalMessages,
-  };
+    return {
+      activeBeacons: activeBeaconsCount,
+      activeAds: activeAdvertsCount,
+      totalLogs,
+      totalMessages,
+    };
+  }, [beacons, adverts, logs, messages]);
 
   useEffect(() => {
-    dispatch(getAdverts());
-    dispatch(getBeacons());
-    dispatch(getMessages());
-    dispatch(getLogs());
+    // Add a small delay to prevent rapid successive calls
+    const timer = setTimeout(() => {
+      dispatch(getAdverts());
+      dispatch(getBeacons());
+      dispatch(getMessages());
+      dispatch(getLogs());
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [dispatch]);
 
-  const logTrendsData = () => {
+  const logTrendsData = useMemo(() => {
     const logsByDay = {};
     logs.forEach(log => {
       const date = new Date(log.timestamp);
@@ -65,14 +72,14 @@ const Dashboard = () => {
       name,
       logs: count,
     }));
-  };
+  }, [logs]);
 
-  const beaconBatteryData = () => {
+  const beaconBatteryData = useMemo(() => {
     return beacons.map(beacon => ({
       name: beacon.name,
       battery: beacon.battery_status,
     }));
-  };
+  }, [beacons]);
 
   if (isLoading || isLoadingBeacons || isLoadingMessages || isLoadingLogs) {
     return (
@@ -123,13 +130,9 @@ const Dashboard = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <LineChart
-          data={logTrendsData()}
-          title="Log Activity Over Time"
-          dataKeys={trendChartKeys}
-        />
+        <LineChart data={logTrendsData} title="Log Activity Over Time" dataKeys={trendChartKeys} />
         <BarChart
-          data={beaconBatteryData()}
+          data={beaconBatteryData}
           title="Beacon Battery Status"
           dataKeys={batteryChartKeys}
         />

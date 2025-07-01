@@ -11,10 +11,11 @@ const defaultCenter = [9.0192, 38.7525];
 
 // Custom marker icons based on status
 const createCustomIcon = status => {
+  const isActive = typeof status === 'string' && status.trim().toLowerCase() === 'active';
   return L.divIcon({
     className: 'custom-marker-icon',
     html: `<div class="w-8 h-8 rounded-full flex items-center justify-center ${
-      status === 'Active' ? 'bg-green-500' : 'bg-red-500'
+      isActive ? 'bg-green-500 ' : 'bg-red-500'
     } border-2 border-white shadow-lg">
       <div class="w-2 h-2 bg-white rounded-full"></div>
     </div>`,
@@ -85,6 +86,35 @@ const formatDate = dateString => {
   });
 };
 
+// Helper to jitter overlapping markers
+function jitterBeacons(beacons) {
+  const seen = {};
+  return beacons.map(beacon => {
+    const key = `${beacon.latitude},${beacon.longitude}`;
+    if (!seen[key]) seen[key] = 0;
+    else seen[key] += 1;
+
+    // Offset by up to ±0.0001 per duplicate (adjust as needed)
+    const offset = seen[key] * 0.0001;
+    return {
+      ...beacon,
+      latitude: beacon.latitude + offset,
+      longitude: beacon.longitude + offset,
+    };
+  });
+}
+
+// Helper to get marker position, using default if lat/lon are 0
+function getPosition(beacon) {
+  if (
+    (beacon.latitude === 0 || beacon.latitude === 0.0) &&
+    (beacon.longitude === 0 || beacon.longitude === 0.0)
+  ) {
+    return [8.9581, 38.7119];
+  }
+  return [beacon.latitude, beacon.longitude];
+}
+
 export default function BeaconMap() {
   const [activeBeacon, setActiveBeacon] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -135,6 +165,11 @@ export default function BeaconMap() {
     );
   }
 
+  // Jitter and order beacons: inactive first, then active (so active is on top)
+  const jittered = jitterBeacons(filteredBeacons);
+  const active = jittered.filter(b => b.status && b.status.trim().toLowerCase() === 'active');
+  const inactive = jittered.filter(b => !b.status || b.status.trim().toLowerCase() !== 'active');
+
   return (
     <div className="w-full p-4 bg-white shadow-md rounded-xl">
       <div className="mb-4 space-y-4">
@@ -159,7 +194,7 @@ export default function BeaconMap() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {/* {activeBeacon && (
+          {activeBeacon && (
             <button
               className="px-3 py-1.5 bg-primary text-white border  rounded-xl text-sm flex items-center gap-1 ml-auto hover:bg-primary/80 transition-colors"
               onClick={() => {
@@ -171,7 +206,7 @@ export default function BeaconMap() {
               <Info size={14} />
               <span>Go to {activeBeacon.name}</span>
             </button>
-          )} */}
+          )}
         </div>
       </div>
 
@@ -190,10 +225,10 @@ export default function BeaconMap() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {filteredBeacons.map(beacon => (
+          {[...inactive, ...active].map(beacon => (
             <Marker
               key={beacon.beacon_id}
-              position={[beacon.latitude, beacon.longitude]}
+              position={getPosition(beacon)}
               icon={createCustomIcon(beacon.status)}
               eventHandlers={{
                 click: () => {
