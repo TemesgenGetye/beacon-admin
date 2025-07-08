@@ -12,8 +12,14 @@ const fetchAPI = async (endpoint, options = {}) => {
     };
 
     // Only set Content-Type to application/json if it's not already set and body is not FormData
+    // For FormData, let the browser set the correct Content-Type with boundary
     if (!headers['Content-Type'] && !(options.body instanceof FormData)) {
       headers['Content-Type'] = 'application/json';
+    }
+
+    // Remove Content-Type for FormData to let browser set it automatically
+    if (options.body instanceof FormData) {
+      delete headers['Content-Type'];
     }
 
     const response = await fetch(url, {
@@ -24,6 +30,7 @@ const fetchAPI = async (endpoint, options = {}) => {
     if (!response.ok) {
       const text = await response.text();
 
+      // Only handle the specific beacon_id case for 500 errors
       if (response.status === 500 && text.includes('beacon_id')) {
         // Handle FormData differently for error cases
         if (options.body instanceof FormData) {
@@ -58,16 +65,6 @@ export const fetchAdvertisement = async id => {
 };
 
 export const createAdvertisement = async data => {
-  console.log('Creating advertisement with data:', data); // Debugging: Log the data being sent
-
-  // If it's FormData, log its contents
-  if (data instanceof FormData) {
-    console.log('FormData contents:');
-    for (let [key, value] of data.entries()) {
-      console.log(`${key}:`, value);
-    }
-  }
-
   return fetchAPI('/advertisements/', {
     method: 'POST',
     body: data,
@@ -75,7 +72,7 @@ export const createAdvertisement = async data => {
 };
 
 export const updateAdvertisement = async data => {
-  return fetchAPI(`/advertisements/${data.get('advertisement_id')}`, {
+  return fetchAPI(`/advertisements/${data.get('advertisement_id')}/`, {
     method: 'PUT',
     body: data,
   });

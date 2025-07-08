@@ -19,6 +19,7 @@ const AdvertModal = ({
     is_active: false,
   });
   const [errors, setErrors] = useState({});
+  const [removeImage, setRemoveImage] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -30,6 +31,7 @@ const AdvertModal = ({
         imagePreview: null,
         is_active: false,
       });
+      setRemoveImage(false);
     }
 
     if (advert) {
@@ -38,6 +40,7 @@ const AdvertModal = ({
         image: null, // New image will be null unless changed
         imagePreview: advert.image_url || null, // Assuming your advert object has an image_url
       });
+      setRemoveImage(false);
     }
   }, [advert]);
 
@@ -65,6 +68,7 @@ const AdvertModal = ({
         image: file,
         imagePreview: previewUrl,
       });
+      setRemoveImage(false); // Reset remove flag when new image is selected
       if (errors.image) {
         setErrors({
           ...errors,
@@ -84,35 +88,53 @@ const AdvertModal = ({
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.content.trim()) newErrors.content = 'Content is required';
-    if (!formData.image && !formData.imagePreview && mode === 'create')
+    if (!formData.image && !formData.imagePreview && mode === 'create') {
       newErrors.image = 'Image is required';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = e => {
     e.preventDefault();
+
     if (validateForm()) {
       const submitData = new FormData();
       submitData.append('title', formData.title);
       submitData.append('content', formData.content);
       submitData.append('is_active', formData.is_active.toString());
 
-      // Add created_by if available (get from localStorage or context)
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       if (user.id) {
         submitData.append('created_by', user.id.toString());
       }
 
       if (formData.image) {
-        submitData.append('media_file', formData.image);
+        submitData.append('image', formData.image);
+      } else if (
+        mode === 'edit' &&
+        formData.imagePreview &&
+        !formData.imagePreview.startsWith('blob:') &&
+        !removeImage
+      ) {
+        console.log('image privew uuuu', formData.imagePreview);
+        submitData.append('image_url', formData.imagePreview);
+      } else if (mode === 'edit' && removeImage) {
+        submitData.append('remove_image', 'true');
       }
+
       onClose();
       if (mode === 'create' && typeof handleAddAdvert === 'function') {
-        console.log('handleAddAdvert:', submitData);
         handleAddAdvert(submitData);
       } else if (mode === 'edit' && typeof handleUpdateAdvert === 'function') {
         submitData.append('advertisement_id', advert.advertisement_id);
+
+        // Log FormData contents properly
+        console.log('Submitted Data:');
+        for (let [key, value] of submitData.entries()) {
+          console.log(`${key}:`, value);
+        }
+
         handleUpdateAdvert(submitData);
       }
     }
@@ -138,7 +160,7 @@ const AdvertModal = ({
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-130px)]">
-          <form>
+          <form id="advert-form" onSubmit={handleSave}>
             <div className="space-y-6">
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-forth mb-1">
@@ -195,6 +217,7 @@ const AdvertModal = ({
                       className="hidden"
                       disabled={show}
                       ref={fileInputRef}
+                      key={`image-input-${advert?.advertisement_id || 'new'}`}
                     />
 
                     <div
@@ -243,6 +266,11 @@ const AdvertModal = ({
                             onClick={e => {
                               e.preventDefault();
                               setFormData({ ...formData, image: null, imagePreview: null });
+                              setRemoveImage(true);
+                              // Reset the file input
+                              if (fileInputRef.current) {
+                                fileInputRef.current.value = '';
+                              }
                             }}
                           >
                             <X className="h-4 w-4" />
@@ -307,16 +335,16 @@ const AdvertModal = ({
             <>
               {advert?.advertisement_id ? (
                 <button
-                  type="button"
-                  onClick={handleSave}
+                  type="submit"
+                  form="advert-form"
                   className="px-4 py-2 bg-primary text-white rounded-xl hover:bg-opacity-80 transition-colors"
                 >
                   Update
                 </button>
               ) : (
                 <button
-                  type="button"
-                  onClick={handleSave}
+                  type="submit"
+                  form="advert-form"
                   className="px-4 py-2 bg-primary text-white rounded-xl hover:bg-opacity-80 transition-colors"
                 >
                   Create

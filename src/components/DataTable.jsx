@@ -22,8 +22,6 @@ const DataTable = ({
     handleDelete(id);
   };
 
-  console.log('beacons', data);
-
   return (
     <div className="overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200">
@@ -75,7 +73,7 @@ const DataTable = ({
                     {column.key === 'image' ? (
                       <div className="flex items-center gap-2">
                         <img
-                          src={row.media_file || '/logo.jpg'} // Note the leading slash
+                          src={row.image_url || '/logo.jpg'}
                           alt="image"
                           className="h-10 w-10 rounded-full"
                         />

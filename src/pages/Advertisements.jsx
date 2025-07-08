@@ -18,13 +18,21 @@ const Advertisements = () => {
   const dispatch = useDispatch();
 
   const handleAddAdvert = async formData => {
-    await dispatch(createAdvert(formData)).unwrap();
-    handleCloseModal();
+    try {
+      await dispatch(createAdvert(formData)).unwrap();
+      handleCloseModal();
+    } catch (error) {
+      // You might want to show an error message to the user here
+    }
   };
 
-  const handleUpdateAdvert = data => {
-    dispatch(updateAdvert(data)).unwrap();
-    handleCloseModal();
+  const handleUpdateAdvert = async data => {
+    try {
+      await dispatch(updateAdvert(data)).unwrap();
+      handleCloseModal();
+    } catch (error) {
+      // You might want to show an error message to the user here
+    }
   };
 
   return (

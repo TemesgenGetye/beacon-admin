@@ -52,7 +52,6 @@ export const createAdvert = createAsyncThunk(
   'advert/createAdvert',
   async (advert, { rejectWithValue }) => {
     try {
-      console.log('createAdvert:', advert);
       const data = await createAdvertisement(advert);
       return data;
     } catch (error) {
